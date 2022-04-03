@@ -1,13 +1,29 @@
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <string.h>
 #include <vector>
-#include <sys/stat.h>
 #include <filesystem>
-#include <termios.h>
-#include <sys/ioctl.h>
-#include "debug/send_debug.hpp"
+
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
+//#include "debug/send_debug.hpp"
+
+/* Debug */
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#define PERMS 0644
+
 
 #ifdef WINDOWS
     #include <direct.h>
@@ -23,7 +39,6 @@ namespace fs = std::filesystem;
 class FileEditor
 {
 private:
-
     /* Append buffer */
     struct abuf {
         char *b = (char*)malloc(0);
@@ -40,6 +55,18 @@ private:
     bool doesPathExist();
 
     /* Terminal handling */
+    typedef struct erow
+    {
+        int size;
+        char *chars;
+    } erow;
+    struct editorConfig
+    {
+        int numrows = 0;
+        //erow *row = NULL;
+        std::vector<erow> row;
+    };
+    editorConfig E;
     int screenrows;
     int screencols;
     struct termios orig_termios;
@@ -47,6 +74,7 @@ private:
     void disableRawMode();
     int getWindowSize(int *rows, int *cols);
     void editorDrawRows();
+    void editorAppendRow(char *s, size_t len);
 
     /* Cursor handling */
     struct cursor {
@@ -63,12 +91,16 @@ private:
         ARROW_RIGHT,
         ARROW_UP,
         ARROW_DOWN,
+        DEL_KEY,
+        HOME_KEY,
+        END_KEY,
         PAGE_UP,
         PAGE_DOWN
     };
     int editorReadKey();
     void editorProcessKeypress();
     void editorRefreshScreen();
+    void editorOpen(char *filename);
 
     /*Error handling */
     void die(const char *s);
@@ -80,6 +112,13 @@ public:
 
     /* Main function */
     void runtime();
+
+    /* Debug */
+    struct my_msgbuf {
+        long mtype;
+        char mtext[200];
+    };
+    void debug(char input[200]);
 };
 
 /* Init */
@@ -108,6 +147,8 @@ void FileEditor::runtime()
 {
     enableRawMode();
     if(getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
+    editorOpen("main.cpp");
+
     while(1)
     {
         editorRefreshScreen();
@@ -198,28 +239,57 @@ void FileEditor::editorDrawRows()
 {
     int y;
     for (y = 0; y < screenrows; y++) {
-        if (y == screenrows / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
-                "File editor -- version %s", EDITOR_VERSION);
-            if (welcomelen > screencols) welcomelen = screencols;
-            int padding = (screencols - welcomelen) / 2;
-            if (padding) {
-                bufferAppend("~", 1);
-                padding--;
+        if (y >= E.numrows) {
+            if(E.numrows == 0 && y == screenrows / 3)
+            {
+                char welcome[80];
+                int welcomelen = snprintf(welcome, sizeof(welcome),
+                    "File editor -- version %s", EDITOR_VERSION);
+                if (welcomelen > screencols) welcomelen = screencols;
+                int padding = (screencols - welcomelen) / 2;
+                if (padding) {
+                    bufferAppend("~", 1);
+                    padding--;
+                }
+                while (padding--) bufferAppend(" ", 1);
+                bufferAppend(welcome, welcomelen);
             }
-            while (padding--) bufferAppend(" ", 1);
-            bufferAppend(welcome, welcomelen);
+            else
+            {
+                bufferAppend("~", 1);
+            }
         }
         else
         {
-            bufferAppend("~", 1);
+            int len = E.row[0].size;
+            if (len > screencols) len = screencols;
+            bufferAppend(E.row[0].chars, len);
         }
         bufferAppend("\x1b[K", 3);
         if (y < screenrows - 1) {
             bufferAppend("\r\n", 2);
         }
     }
+}
+
+void FileEditor::editorAppendRow(char *s, size_t len)
+{
+    char *xd;
+    std::sprintf(xd, "%d", len);
+    debug(xd);
+    debug(s);
+    //Crashes here currently
+    erow placeholder
+    {
+        len,
+        s
+    };
+    E.row[0].size = len;
+    debug("xd");
+    E.row.assign(E.row.size(), placeholder);
+    memcpy(E.row[E.row.size()-2].chars, s, len);
+    E.row[E.row.size()-2].chars[len] = '\0';
+    E.numrows = 1;
 }
 
 /* Cursor handling */
@@ -259,6 +329,28 @@ void FileEditor::editorMoveCursor(int key)
 }
 
 /* Input handling */
+
+void FileEditor::editorOpen(char *filename)
+{
+    FILE *fp = fopen(filename, "r");
+    if (!fp) die("fopen");
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
+    linelen = getline(&line, &linecap, fp);
+    if (linelen != -1)
+    {
+        while (linelen > 0 && (line[linelen - 1] == '\n' ||
+                                line[linelen - 1] == '\r'))
+            linelen--;
+        
+        editorAppendRow(line, linelen);
+        debug("crash here2");
+    }
+    free(line);
+    fclose(fp);
+}
+
 int FileEditor::editorReadKey()
 {
     int nread;
@@ -275,12 +367,42 @@ int FileEditor::editorReadKey()
         if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
         if (seq[0] == '[')
         {
-            switch (seq[1])
+            if (seq[1] >= '0' && seq[1] <= '9')
             {
-                case 'A': return ARROW_UP;
-                case 'B': return ARROW_DOWN;
-                case 'C': return ARROW_RIGHT;
-                case 'D': return ARROW_LEFT;
+                if (read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+                if (seq[2] == '~')
+                {
+                    switch (seq[1])
+                    {
+                        case '1': return HOME_KEY;
+                        case '3': return DEL_KEY;
+                        case '4': return END_KEY;
+                        case '5': return PAGE_UP;
+                        case '6': return PAGE_DOWN;
+                        case '7': return HOME_KEY;
+                        case '8': return END_KEY;
+                    }
+                }
+            }
+            else
+            {
+                switch (seq[1])
+                {
+                    case 'A': return ARROW_UP;
+                    case 'B': return ARROW_DOWN;
+                    case 'C': return ARROW_RIGHT;
+                    case 'D': return ARROW_LEFT;
+                    case 'H': return HOME_KEY;
+                    case 'F': return END_KEY;
+                }
+            }
+        }
+        else if (seq[0] == 'O')
+        {
+            switch(seq[1])
+            {
+                case 'H': return HOME_KEY;
+                case 'F': return END_KEY;
             }
         }
         return '\x1b';
@@ -293,26 +415,33 @@ int FileEditor::editorReadKey()
  
 void FileEditor::editorProcessKeypress()
 {
-    int c = editorReadKey();
-    int times = screenrows;
-    switch (c) {
+    int read_key = editorReadKey();
+    switch (read_key)
+    {
         case CTRL_KEY('q'):
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
-
             exit(0);
+            break;
+        case HOME_KEY:
+            c.x = 0;
+            break;
+        case END_KEY:
+            c.x = screencols - 1;
             break;
         case PAGE_UP:
         case PAGE_DOWN:
-            debug("Running pagedown");
+            {
+            int times = screenrows;
             while (times--)
-                editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+                editorMoveCursor(read_key == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+            }
             break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
         case ARROW_RIGHT:
-            editorMoveCursor(c);
+            editorMoveCursor(read_key);
             break;
     }
     
@@ -346,4 +475,41 @@ void FileEditor::die(const char *s)
 
     perror(s);
     exit(1);
+}
+
+/* Debugging */
+void FileEditor::debug(char input[200])
+{
+    struct my_msgbuf buf;
+    int msqid;
+    int len;
+    key_t key;
+
+    if ((key = ftok("msgq.txt", 'B')) == -1) {
+        perror("ftok");
+        exit(1);
+    }
+
+    if ((msqid = msgget(key, PERMS)) == -1) {
+        perror("msgget");
+        exit(1);
+    }
+    //printf("message queue: ready to send messages.\n");
+    //printf("Enter lines of text, ^D to quit:\n");
+
+    int x = 0;
+    while(input[x] != '\0' && input[x] != '\n')
+    {
+        buf.mtext[x] = input[x];
+        x += 1;
+    }
+    buf.mtype = x;
+
+    
+    //std::cout << buf.mtext << "\n";
+
+    /* remove newline at end, if it exists */
+    buf.mtext[buf.mtype] = '\0';
+    if (msgsnd(msqid, &buf, buf.mtype+1, 0) == -1) /* +1 for '\0' */
+        perror("msgsnd");
 }
