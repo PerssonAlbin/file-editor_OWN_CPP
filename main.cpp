@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     {
         arg_copy = argv[1];
     }
-    else if(argc < 2) 
+    else if(argc > 2) 
     {
         std::cout << "Max 2 arguments allowed\n";
         return -1;

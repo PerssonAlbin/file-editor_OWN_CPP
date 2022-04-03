@@ -49,7 +49,12 @@ private:
 
     /* Path handling */
     std::string path;
-    std::vector<std::string> file_list;
+    struct file_path_list
+    {
+        int size;
+        char* path = (char*)malloc(0);
+    };
+    file_path_list file_list;
     void createPath(int argc, std::string argv);
     void monitorFileList();
     bool doesPathExist();
@@ -63,18 +68,20 @@ private:
     struct editorConfig
     {
         int numrows = 0;
-        //erow *row = NULL;
-        std::vector<erow> row;
+        erow *row = NULL;
+        int rowoff = 0;
+        int coloff = 0;
     };
     editorConfig E;
     int screenrows;
     int screencols;
-    struct termios orig_termios;
+    
     void enableRawMode();
-    void disableRawMode();
+    //void disableRawMode();
     int getWindowSize(int *rows, int *cols);
     void editorDrawRows();
     void editorAppendRow(char *s, size_t len);
+    void editorScroll();
 
     /* Cursor handling */
     struct cursor {
@@ -103,7 +110,7 @@ private:
     void editorOpen(char *filename);
 
     /*Error handling */
-    void die(const char *s);
+    //void die(const char *s);
     
 public:
     /* Init */
@@ -113,6 +120,7 @@ public:
     /* Main function */
     void runtime();
 
+
     /* Debug */
     struct my_msgbuf {
         long mtype;
@@ -120,6 +128,8 @@ public:
     };
     void debug(char input[200]);
 };
+
+struct termios orig_termios;
 
 /* Init */
 FileEditor::FileEditor(int argc, std::string argv)
@@ -138,8 +148,18 @@ FileEditor::FileEditor(int argc, std::string argv)
 
 FileEditor::~FileEditor()
 {
-    disableRawMode();
     free(buffer.b);
+}
+
+
+/* Error handling */
+void die(const char *s)
+{
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    perror(s);
+    exit(1);
 }
 
 /* Main function */
@@ -147,7 +167,7 @@ void FileEditor::runtime()
 {
     enableRawMode();
     if(getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
-    editorOpen("main.cpp");
+    editorOpen(file_list.path);
 
     while(1)
     {
@@ -193,7 +213,9 @@ void FileEditor::createPath(int argc, std::string argv)
 void FileEditor::monitorFileList()
 {
     for (const auto & entry : fs::recursive_directory_iterator(this->path))
-        file_list.insert(std::end(file_list), entry.path());
+    {
+        file_list
+    }
 }
 
 bool FileEditor::doesPathExist()
@@ -203,32 +225,37 @@ bool FileEditor::doesPathExist()
 }
 
 /* Terminal handling */
-void FileEditor::enableRawMode()
-{
-    if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
-    struct termios raw = orig_termios;
-    raw.c_iflag &= ~(ICRNL | IXON);
-    raw.c_oflag &= ~(OPOST);
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN);
-    raw.c_cc[VMIN] = 0;
-    raw.c_cc[VTIME] = 1;
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-}
-
-void FileEditor::disableRawMode()
+void disableRawMode(void)
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
 }
 
+void FileEditor::enableRawMode()
+{
+    if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+    atexit(disableRawMode);
+    struct termios raw = orig_termios;
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+}
+
 int FileEditor::getWindowSize(int *rows, int *cols)
 {
     struct winsize ws;
-      if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) 
+    {
         if(write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
         return getCursorPosition(rows, cols);
-    } else {
+    }
+    else
+    {
         *cols = ws.ws_col;
         *rows = ws.ws_row;
         return 0;
@@ -238,8 +265,11 @@ int FileEditor::getWindowSize(int *rows, int *cols)
 void FileEditor::editorDrawRows()
 {
     int y;
-    for (y = 0; y < screenrows; y++) {
-        if (y >= E.numrows) {
+    for (y = 0; y < screenrows; y++)
+    {
+        int filerow = y + E.rowoff;
+        if (filerow >= E.numrows)
+        {
             if(E.numrows == 0 && y == screenrows / 3)
             {
                 char welcome[80];
@@ -261,9 +291,10 @@ void FileEditor::editorDrawRows()
         }
         else
         {
-            int len = E.row[0].size;
+            int len = E.row[filerow].size - E.coloff;
+            if (len < 0) len = 0;
             if (len > screencols) len = screencols;
-            bufferAppend(E.row[0].chars, len);
+            bufferAppend(&E.row[filerow].chars[E.coloff], len);
         }
         bufferAppend("\x1b[K", 3);
         if (y < screenrows - 1) {
@@ -274,24 +305,35 @@ void FileEditor::editorDrawRows()
 
 void FileEditor::editorAppendRow(char *s, size_t len)
 {
-    char *xd;
-    std::sprintf(xd, "%d", len);
-    debug(xd);
-    debug(s);
-    //Crashes here currently
-    erow placeholder
-    {
-        len,
-        s
-    };
-    E.row[0].size = len;
-    debug("xd");
-    E.row.assign(E.row.size(), placeholder);
-    memcpy(E.row[E.row.size()-2].chars, s, len);
-    E.row[E.row.size()-2].chars[len] = '\0';
-    E.numrows = 1;
+    E.row = (erow*)realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    int at = E.numrows;
+    E.row[at].size = len;
+    E.row[at].chars = (char*)malloc(len + 1);
+    memcpy(E.row[at].chars, s, len);
+    E.row[at].chars[len] = '\0';
+    E.numrows++;
 }
 
+void FileEditor::editorScroll()
+{
+    //Vertical scrolling
+    if(c.y < E.rowoff)
+    {
+        E.rowoff = c.y;
+    }
+    if(c.y >= E.rowoff + screenrows)
+    {
+        E.rowoff = c.y - screenrows + 1;
+    }
+    if(c.x < E.coloff)
+    {
+        E.coloff = c.x;
+    }
+    if(c.x >= E.coloff + screencols)
+    {
+        E.coloff = c.x - screencols + 1;
+    }
+}
 /* Cursor handling */
 int FileEditor::getCursorPosition(int *rows, int *cols)
 {
@@ -311,21 +353,44 @@ int FileEditor::getCursorPosition(int *rows, int *cols)
 
 void FileEditor::editorMoveCursor(int key)
 {
+    /* Moves cursor based on cases it gets from */
+
+    erow *row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
     switch (key)
     {
         case ARROW_LEFT:
-            if(c.x != 0) c.x--;
+            if(c.x != 0)
+            {
+                c.x--;
+            }
+            else if (c.y > 0)
+            {
+                c.y--;
+                c.x = E.row[c.y].size;
+            }
             break;
         case ARROW_RIGHT:
-            if(c.x != screencols -1) c.x++;
+            if(row && c.x < row->size)
+            {
+                c.x++;
+            }
+            // Not sure I want this part.
+            else if(row && c.x == row->size)
+            {
+                c.y++;
+                c.x = 0;
+            }
             break;
         case ARROW_UP:
             if(c.y != 0) c.y--;
             break;
         case ARROW_DOWN:
-            if(c.y != screencols -1) c.y++;
+            if(c.y < E.numrows) c.y++;
             break;
     }
+    row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
+    int rowlen = row ? row->size : 0;
+    if (c.x > rowlen) c.x = rowlen;
 }
 
 /* Input handling */
@@ -334,18 +399,18 @@ void FileEditor::editorOpen(char *filename)
 {
     FILE *fp = fopen(filename, "r");
     if (!fp) die("fopen");
+
     char *line = NULL;
     size_t linecap = 0;
     ssize_t linelen;
     linelen = getline(&line, &linecap, fp);
-    if (linelen != -1)
+    while ((linelen = getline(&line, &linecap, fp)) != -1)
     {
         while (linelen > 0 && (line[linelen - 1] == '\n' ||
                                 line[linelen - 1] == '\r'))
             linelen--;
         
         editorAppendRow(line, linelen);
-        debug("crash here2");
     }
     free(line);
     fclose(fp);
@@ -449,6 +514,8 @@ void FileEditor::editorProcessKeypress()
 
 void FileEditor::editorRefreshScreen()
 {
+    editorScroll();
+
     bufferAppend("\x1b[?25l", 6);
     bufferAppend("\x1b[H", 3);
 
@@ -456,26 +523,16 @@ void FileEditor::editorRefreshScreen()
 
     char buf[32];
     //Tracks cursor
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", c.y + 1, c.x + 1);
+      snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (c.y - E.rowoff) + 1, (c.x - E.coloff) + 1);
     bufferAppend(buf, strlen(buf));
 
     bufferAppend("\x1b[?25h", 6);
 
     write(STDOUT_FILENO, buffer.b, buffer.len);
     buffer.len = 0;
-    //May be wrong
     buffer.b = (char*)realloc(buffer.b, 0);
 }
 
-/* Error handling */
-void FileEditor::die(const char *s)
-{
-    write(STDOUT_FILENO, "\x1b[2J", 4);
-    write(STDOUT_FILENO, "\x1b[H", 3);
-
-    perror(s);
-    exit(1);
-}
 
 /* Debugging */
 void FileEditor::debug(char input[200])
