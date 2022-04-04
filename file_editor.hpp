@@ -49,10 +49,14 @@ private:
 
     /* Path handling */
     std::string path;
+    struct paths 
+    {
+        char* path;
+    };
     struct file_path_list
     {
-        int size;
-        char* path = (char*)malloc(0);
+        paths* p = (paths*)malloc(0);
+        int size = 0;
     };
     file_path_list file_list;
     void createPath(int argc, std::string argv);
@@ -127,6 +131,8 @@ public:
         char mtext[200];
     };
     void debug(char input[200]);
+    void debug(std::string input);
+    void debug(int input);
 };
 
 struct termios orig_termios;
@@ -167,8 +173,9 @@ void FileEditor::runtime()
 {
     enableRawMode();
     if(getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
-    editorOpen(file_list.path);
-
+    int file = file_list.size-2;
+    //debug(file_list.p[file].path);
+    editorOpen(file_list.p[file].path);
     while(1)
     {
         editorRefreshScreen();
@@ -212,9 +219,18 @@ void FileEditor::createPath(int argc, std::string argv)
 
 void FileEditor::monitorFileList()
 {
+    std::string placeholder;
+    int len;
     for (const auto & entry : fs::recursive_directory_iterator(this->path))
     {
-        file_list
+        file_list.p = (paths*)realloc(file_list.p, sizeof(paths) * (file_list.size + 1));
+
+        placeholder = entry.path();
+        len = placeholder.size();
+        file_list.p[file_list.size].path = (char*)malloc(len + 1);
+        memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
+        file_list.p[file_list.size].path[len] = '\0';
+        file_list.size++;
     }
 }
 
@@ -558,6 +574,78 @@ void FileEditor::debug(char input[200])
     while(input[x] != '\0' && input[x] != '\n')
     {
         buf.mtext[x] = input[x];
+        x += 1;
+    }
+    buf.mtype = x;
+
+    
+    //std::cout << buf.mtext << "\n";
+
+    /* remove newline at end, if it exists */
+    buf.mtext[buf.mtype] = '\0';
+    if (msgsnd(msqid, &buf, buf.mtype+1, 0) == -1) /* +1 for '\0' */
+        perror("msgsnd");
+}
+
+void FileEditor::debug(std::string input)
+{
+    struct my_msgbuf buf;
+    int msqid;
+    int len;
+    key_t key;
+
+    if ((key = ftok("msgq.txt", 'B')) == -1) {
+        perror("ftok");
+        exit(1);
+    }
+
+    if ((msqid = msgget(key, PERMS)) == -1) {
+        perror("msgget");
+        exit(1);
+    }
+    //printf("message queue: ready to send messages.\n");
+    //printf("Enter lines of text, ^D to quit:\n");
+
+    int x = 0;
+    while(input[x] != '\0' && input[x] != '\n')
+    {
+        buf.mtext[x] = input[x];
+        x += 1;
+    }
+    buf.mtype = x;
+
+    
+    //std::cout << buf.mtext << "\n";
+
+    /* remove newline at end, if it exists */
+    buf.mtext[buf.mtype] = '\0';
+    if (msgsnd(msqid, &buf, buf.mtype+1, 0) == -1) /* +1 for '\0' */
+        perror("msgsnd");
+}
+
+void FileEditor::debug(int input)
+{
+    struct my_msgbuf buf;
+    int msqid;
+    int len;
+    key_t key;
+
+    if ((key = ftok("msgq.txt", 'B')) == -1) {
+        perror("ftok");
+        exit(1);
+    }
+
+    if ((msqid = msgget(key, PERMS)) == -1) {
+        perror("msgget");
+        exit(1);
+    }
+    std::ostringstream n_str;
+    n_str << input;
+    std::string input_str = n_str.str();
+    int x = 0;
+    while(input_str[x] != '\0' && input_str[x] != '\n')
+    {
+        buf.mtext[x] = input_str[x];
         x += 1;
     }
     buf.mtype = x;
