@@ -24,8 +24,5 @@ int main(int argc, char* argv[])
         return -1;
     }
     
-    //std::fstream my_file;
-    //my_file.open(path, std::ios_base::in | std::ios_base::out);
-    //my_file.close();
     return 0;
 }
