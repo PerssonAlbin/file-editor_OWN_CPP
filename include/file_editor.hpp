@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdarg.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -39,9 +40,10 @@ private:
     /* Path handling */
     int file_number = 0;
     std::string path;
-    struct paths 
+    struct paths
     {
         char* path;
+        int size;
     };
     struct file_path_list
     {
@@ -49,8 +51,9 @@ private:
         int size = 0;
     };
     file_path_list file_list;
-    void createPath(int argc, std::string argv);
-    void monitorFileList();
+    void formatPath(int argc, std::string argv);
+    void createFileList();
+    bool isDirectory(std::string path);
     bool doesPathExist();
 
     /* Terminal handling */
@@ -67,6 +70,8 @@ private:
         erow *row = NULL;
         int rowoff = 0;
         int coloff = 0;
+        char statusmsg[80];
+        time_t statusmsg_time = 0;
     };
     editorConfig E;
     int screenrows;
@@ -76,8 +81,11 @@ private:
     //void disableRawMode();
     int getWindowSize(int *rows, int *cols);
     void editorDrawRows();
+    void editorDrawStatusBar();
     void editorAppendRow(char *s, size_t len);
     void editorScroll();
+    void editorSetStatusMessage(const char* fmt, ...);
+    void editorDrawMessageBar();
 
     /* Cursor handling */
     struct cursor {

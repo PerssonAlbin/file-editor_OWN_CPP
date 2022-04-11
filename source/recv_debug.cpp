@@ -42,7 +42,7 @@ int main(void) {
             exit(1);
         }
         std::cout << "recvd: " << buf.mtext << "\n";
-        if(strcmp(buf.mtext,"end")) break;
+        //if(strcmp(buf.mtext,"end")) break;
     }
     printf("message queue: done receiving messages.\n");
     system("rm msgq.txt");
