@@ -17,7 +17,6 @@ struct my_msgbuf {
 int main(void) {
     struct my_msgbuf buf;
     int msqid;
-    int toend;
     key_t key;
     system("touch msgq.txt");
     
@@ -43,8 +42,7 @@ int main(void) {
             exit(1);
         }
         std::cout << "recvd: " << buf.mtext << "\n";
-        if (buf.mtext == "end")
-        break;
+        if(strcmp(buf.mtext,"end")) break;
     }
     printf("message queue: done receiving messages.\n");
     system("rm msgq.txt");

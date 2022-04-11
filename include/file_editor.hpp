@@ -1,7 +1,7 @@
 #ifndef FILE_EDITOR_H
 #define FILE_EDITOR_H
 
-#include "debug/send_debug.hpp"
+#include "send_debug.hpp"
 
 #include <termios.h>
 #include <sys/ioctl.h>

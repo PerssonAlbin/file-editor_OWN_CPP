@@ -1,10 +1,9 @@
 #include "file_editor.hpp"
+//#include "send_debug.hpp"
 
-#include "debug/send_debug.cpp"
-
-#define _DEFAULT_SOURCE
+//#define _DEFAULT_SOURCE
 #define _BSD_SOURCE
-#define _GNU_SOURCE
+//#define _GNU_SOURCE
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define EDITOR_VERSION "0.0.1"
@@ -73,7 +72,7 @@ void FileEditor::bufferAppend(const char *s, int len)
 void FileEditor::createPath(int argc, std::string argv)
 {
     char cwd[256];
-    if(argc == 1 || argc == 2 && argv == ".")
+    if(argc == 1 || (argc == 2 && argv == "."))
     {
         getcwd(cwd, sizeof(cwd));
         path = std::string(cwd);
@@ -382,12 +381,13 @@ void FileEditor::editorProcessKeypress()
         case CTRL_KEY('w'):
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
-            debug.send("Detect arrow click");
+            //debug.send((char*)"Detect arrow click");
             if(file_number >= 0 && file_number < file_list.size)
             {
                 
                 file_number++;
-                debug.send(file_list.p[file_number].path);
+                debug.send(123);
+                //debug.send((char*)file_list.p[file_number].path);
                 editorOpen(file_list.p[file_number].path);
             }
             break;

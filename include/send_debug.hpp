@@ -10,13 +10,14 @@
 #include <sys/msg.h>
 #include <sstream>
 
+
 class SendDebug
 {
 public:
     void send(char input[200]);
     void send(std::string input);
     void send(int input);
-    
+    SendDebug();
 private:
     struct my_msgbuf
     {

@@ -2,11 +2,12 @@
 
 #define PERMS 0644
 
+SendDebug::SendDebug(){}
+
 void SendDebug::send(char input[200])
 {
     struct my_msgbuf buf;
     int msqid;
-    int len;
     key_t key;
 
     if ((key = ftok("msgq.txt", 'B')) == -1)
@@ -39,7 +40,6 @@ void SendDebug::send(std::string input)
 {
     struct my_msgbuf buf;
     int msqid;
-    int len;
     key_t key;
 
     if ((key = ftok("msgq.txt", 'B')) == -1)
@@ -72,7 +72,6 @@ void SendDebug::send(int input)
 {
     struct my_msgbuf buf;
     int msqid;
-    int len;
     key_t key;
 
     if ((key = ftok("msgq.txt", 'B')) == -1)
