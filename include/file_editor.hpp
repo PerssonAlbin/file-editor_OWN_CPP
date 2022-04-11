@@ -25,7 +25,8 @@ class FileEditor
 {
 private:
     /* Append buffer */
-    struct abuf {
+    struct abuf
+    {
         char *b = (char*)malloc(0);
         int len = 0;
     };
@@ -82,10 +83,12 @@ private:
     struct cursor {
         int x = 0;
         int y = 0;
+        int rx = 0; // Position correction for tabs
     };
     cursor c;
     int getCursorPosition(int *rows, int *cols);
     void editorMoveCursor(int key);
+    int editorRowCxToRx();
 
     /* Input handling */
     enum editorKey {

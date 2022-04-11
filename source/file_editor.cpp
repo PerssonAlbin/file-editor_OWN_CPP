@@ -7,6 +7,7 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define EDITOR_VERSION "0.0.1"
+#define TAB_STOP 8
 namespace fs = std::filesystem;
 
 struct termios orig_termios;
@@ -40,7 +41,6 @@ FileEditor::~FileEditor()
 {
     free(buffer.b);
 }
-
 
 /* Main function */
 void FileEditor::runtime()
@@ -203,7 +203,7 @@ void FileEditor::editorUpdateRow()
         if (E.row[at].chars[j] == '\t') tabs++;
 
     free(E.row[at].render);
-    E.row[at].render = (char*)malloc(E.row[at].size + tabs*7 + 1);
+    E.row[at].render = (char*)malloc(E.row[at].size + tabs*(TAB_STOP - 1) + 1);
 
     
     //E.row[at].render = (char*)malloc(E.row[at].size + 1);
@@ -214,7 +214,7 @@ void FileEditor::editorUpdateRow()
         if(E.row[at].chars[j] == '\t')
         {
             E.row[at].render[idx++] = ' ';
-            while(idx % 8 != 0) E.row[at].render[idx++] = ' ';
+            while(idx % TAB_STOP != 0) E.row[at].render[idx++] = ' ';
         }
         else
         {
@@ -243,6 +243,11 @@ void FileEditor::editorAppendRow(char *s, size_t len)
 
 void FileEditor::editorScroll()
 {
+    c.rx = 0;
+    if(c.y < E.numrows)
+    {
+        c.rx = editorRowCxToRx();
+    }
     //Vertical scrolling
     if(c.y < E.rowoff)
     {
@@ -252,15 +257,16 @@ void FileEditor::editorScroll()
     {
         E.rowoff = c.y - screenrows + 1;
     }
-    if(c.x < E.coloff)
+    if(c.rx < E.coloff)
     {
-        E.coloff = c.x;
+        E.coloff = c.rx;
     }
-    if(c.x >= E.coloff + screencols)
+    if(c.rx >= E.coloff + screencols)
     {
-        E.coloff = c.x - screencols + 1;
+        E.coloff = c.rx - screencols + 1;
     }
 }
+
 /* Cursor handling */
 int FileEditor::getCursorPosition(int *rows, int *cols)
 {
@@ -318,6 +324,18 @@ void FileEditor::editorMoveCursor(int key)
     row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
     int rowlen = row ? row->size : 0;
     if (c.x > rowlen) c.x = rowlen;
+}
+
+int FileEditor::editorRowCxToRx()
+{
+    int rx = 0;
+    int j;
+    for (j = 0; j < c.x; j++) {
+        if (E.row[c.y].chars[j] == '\t')
+        rx += (TAB_STOP - 1) - (rx % TAB_STOP);
+        rx++;
+    }
+    return rx;
 }
 
 /* Input handling */
@@ -437,9 +455,19 @@ void FileEditor::editorProcessKeypress()
         case PAGE_UP:
         case PAGE_DOWN:
             {
-            int times = screenrows;
-            while (times--)
-                editorMoveCursor(read_key == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+                if(read_key == PAGE_UP)
+                {
+                    c.y = E.rowoff;
+                }
+                else if(read_key == PAGE_DOWN)
+                {
+                    c.y = E.rowoff + screenrows - 1;
+                    if(c.y > E.numrows) c.y = E.numrows;
+                }
+
+                int times = screenrows;
+                while (times--)
+                    editorMoveCursor(read_key == PAGE_UP ? ARROW_UP : ARROW_DOWN);
             }
             break;
         case ARROW_UP:
@@ -463,7 +491,7 @@ void FileEditor::editorRefreshScreen()
 
     char buf[32];
     //Tracks cursor
-      snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (c.y - E.rowoff) + 1, (c.x - E.coloff) + 1);
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (c.y - E.rowoff) + 1, (c.rx - E.coloff) + 1);
     bufferAppend(buf, strlen(buf));
 
     bufferAppend("\x1b[?25h", 6);
