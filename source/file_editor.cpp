@@ -181,16 +181,48 @@ void FileEditor::editorDrawRows()
         }
         else
         {
-            int len = E.row[filerow].size - E.coloff;
+            int len = E.row[filerow].rsize - E.coloff;
             if (len < 0) len = 0;
             if (len > screencols) len = screencols;
-            bufferAppend(&E.row[filerow].chars[E.coloff], len);
+            bufferAppend(&E.row[filerow].render[E.coloff], len);
         }
         bufferAppend("\x1b[K", 3);
         if (y < screenrows - 1) {
             bufferAppend("\r\n", 2);
         }
     }
+}
+
+void FileEditor::editorUpdateRow()
+{
+    int tabs = 0;
+    int at = E.numrows;
+    int j;
+
+    for (j = 0; j < E.row[at].size; j++)
+        if (E.row[at].chars[j] == '\t') tabs++;
+
+    free(E.row[at].render);
+    E.row[at].render = (char*)malloc(E.row[at].size + tabs*7 + 1);
+
+    
+    //E.row[at].render = (char*)malloc(E.row[at].size + 1);
+    
+    int idx = 0;
+    for (j = 0; j < E.row[at].size; j++)
+    {
+        if(E.row[at].chars[j] == '\t')
+        {
+            E.row[at].render[idx++] = ' ';
+            while(idx % 8 != 0) E.row[at].render[idx++] = ' ';
+        }
+        else
+        {
+            E.row[at].render[idx++] = E.row[at].chars[j];
+        }
+    }
+    E.row[at].render[idx] = '\0';
+    E.row[at].rsize = idx;
 }
 
 void FileEditor::editorAppendRow(char *s, size_t len)
@@ -201,6 +233,11 @@ void FileEditor::editorAppendRow(char *s, size_t len)
     E.row[at].chars = (char*)malloc(len + 1);
     memcpy(E.row[at].chars, s, len);
     E.row[at].chars[len] = '\0';
+
+    E.row[at].rsize = 0;
+    E.row[at].render = NULL;
+    editorUpdateRow();
+
     E.numrows++;
 }
 

@@ -26,7 +26,7 @@ $(EXECUTABLE): $(BUILD)file_editor.o $(BUILD)send_debug.o $(BUILD)main.o
 $(BUILD)send_debug.o: $(SOURCE)send_debug.cpp $(INCLUDES)send_debug.hpp
 		g++ $(CPPFLAGS) -c $(SOURCE)send_debug.cpp -I $(INCLUDES) -o $(BUILD)send_debug.o
 
-$(BUILD)file_editor.o: $(BUILD)main.o $(SOURCE)file_editor.cpp $(INCLUDES)file_editor.hpp
+$(BUILD)file_editor.o: $(SOURCE)file_editor.cpp $(INCLUDES)file_editor.hpp
 		g++ $(CPPFLAGS) -c $(SOURCE)file_editor.cpp -I $(INCLUDES) -o $(BUILD)file_editor.o
 
 $(BUILD)main.o: $(SOURCE)main.cpp

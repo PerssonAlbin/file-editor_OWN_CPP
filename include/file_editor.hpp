@@ -32,6 +32,8 @@ private:
     abuf buffer;
     void bufferAppend(const char *s, int len);
 
+    /* Render handling */
+    void editorUpdateRow();
     SendDebug debug;
     /* Path handling */
     int file_number = 0;
@@ -53,8 +55,10 @@ private:
     /* Terminal handling */
     typedef struct erow
     {
-        int size;
+        int rsize = 0;
+        int size = 0;
         char *chars;
+        char *render;
     } erow;
     struct editorConfig
     {
