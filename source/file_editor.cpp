@@ -460,6 +460,32 @@ void FileEditor::editorOpen(char *filename)
     fclose(fp);
 }
 
+/*Resets all the settings from the previous file*/
+void FileEditor::resetRows()
+{
+    editorFlushRows();
+    E.numrows = 0;
+    E.coloff = 0;
+    E.rowoff = 0;
+    c.x = 0;
+    c.rx = 0;
+    c.y = 0;
+}
+
+/*Frees all the rows generated from file*/
+void FileEditor::editorFlushRows()
+{
+    int x = 0;
+    while(x < E.numrows)
+    {
+        free(E.row[x].chars);
+        free(E.row[x].render);
+        x += 1;
+    }
+    free(E.row);
+    E.row = NULL;
+}
+
 /*Detects new input and formats it into a int.*/
 int FileEditor::editorReadKey()
 {
@@ -542,6 +568,7 @@ void FileEditor::editorProcessKeypress()
             {
                 file_number++;
                 debug.send((char*)file_list.p[file_number].path);
+                resetRows();
                 editorOpen(file_list.p[file_number].path);
             }
             break;

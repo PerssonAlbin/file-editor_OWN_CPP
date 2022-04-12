@@ -114,6 +114,8 @@ private:
     void editorProcessKeypress();
     void editorRefreshScreen();
     void editorOpen(char *filename);
+    void resetRows();
+    void editorFlushRows();
 
 public:
     /* Init */
