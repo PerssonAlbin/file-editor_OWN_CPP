@@ -42,6 +42,7 @@ private:
     std::string path;
     struct paths
     {
+        char* filename;
         char* path;
         int size;
     };

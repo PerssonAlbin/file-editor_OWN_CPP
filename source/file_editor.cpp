@@ -118,7 +118,22 @@ void FileEditor::createFileList()
         }
         else
         {
+            //Creates a new path entry
             file_list.p = (paths*)realloc(file_list.p, sizeof(paths) * (file_list.size + 1));
+            std::string filename;
+            if(placeholder.size() > 20)
+            {
+                int slash = placeholder.find_last_of('/');
+                filename = placeholder.substr(slash+1);
+            }
+            else
+            {
+                filename = placeholder;
+            }
+            file_list.p[file_list.size].filename = (char*)malloc(filename.size() + 1);
+            memcpy(file_list.p[file_list.size].filename, filename.c_str(), filename.size());
+            file_list.p[file_list.size].filename[filename.size()] = '\0';
+
             file_list.p[file_list.size].path = (char*)malloc(len + 1);
             memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
             file_list.p[file_list.size].path[len] = '\0';
@@ -244,7 +259,7 @@ void FileEditor::editorDrawStatusBar()
     char status[80];
     char rstatus[80];
     int len = snprintf(status, sizeof(status), "%.20s",
-        file_list.p[file_number].path ? file_list.p[file_number].path : "[No Name]");
+        file_list.p[file_number].filename ? file_list.p[file_number].filename : "[No Name]");
     int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
         c.y +1, E.numrows);
     if (len > screencols) len = screencols;
