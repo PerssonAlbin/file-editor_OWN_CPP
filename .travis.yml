@@ -18,7 +18,7 @@ matrix:
   include:
     # GCC 6
     - os: linux
-      env: UNIT_TESTS=true COMPILER=g++-6     BOOST_VERSION=default ENABLE_MEMCHECK=true
+      env: UNIT_TESTS=true COMPILER=g++-6 ENABLE_MEMCHECK=true
       compiler: gcc
 
 before_install:
@@ -39,7 +39,7 @@ before_script:
   - git config --global user.email "<>"
 
   - cd ${TRAVIS_BUILD_DIR}
-  - (mkdir build && cd build && cmake .. ${CMAKE_OPTIONS})
+  - (cd build && cmake .. ${CMAKE_OPTIONS})
 
 script:
   - |
