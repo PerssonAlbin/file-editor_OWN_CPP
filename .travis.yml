@@ -39,7 +39,6 @@ before_script:
   - git config --global user.email "<>"
 
   - cd ${TRAVIS_BUILD_DIR}
-  - (cd build && cmake .. ${CMAKE_OPTIONS})
 
 script:
   - |
