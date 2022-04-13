@@ -21,7 +21,7 @@ void die(const char *s)
     write(STDOUT_FILENO, "\x1b[H", 3);
 
     perror(s);
-    exit(1);
+    //exit(1);
 }
 
 /* Init */
@@ -29,7 +29,6 @@ FileEditor::FileEditor(int argc, std::string argv)
 {
     E.statusmsg[0] = '\0';
     formatPath(argc, argv);
-    //std::cout << "Path: " << path << "\n";
     if(doesPathExist())
     {
         this->createFileList();
@@ -40,9 +39,28 @@ FileEditor::FileEditor(int argc, std::string argv)
     }
 }
 
+//Destructor functions
+
+void FileEditor::clearFileList()
+{
+    int x = 0;
+    while(file_list.size > x)
+    {
+        free(file_list.p[x].filename);
+        free(file_list.p[x].path);
+        x += 1;
+    }
+    
+    free(file_list.p);
+}
+
+//Does not seem to be called
 FileEditor::~FileEditor()
 {
     free(buffer.b);
+    editorFlushRows();
+    clearFileList();
+    disableRawMode();
 }
 
 /* Main function */
@@ -51,14 +69,14 @@ void FileEditor::runtime()
     enableRawMode();
     if(getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
     screenrows -= 2; //Compensate for having a status bar
-
+    
     editorOpen(file_list.p[file_number].path);
     editorSetStatusMessage("HELP: Ctrl-Q = quit");
-
-    while(1)
+    bool loop = true;
+    while(loop)
     {
         editorRefreshScreen();
-        editorProcessKeypress();
+        loop = editorProcessKeypress();
     }
 }
 
@@ -86,18 +104,18 @@ void FileEditor::formatPath(int argc, std::string argv)
     if(argc == 1 || (argc == 2 && argv == "."))
     {
         getcwd(cwd, sizeof(cwd));
-        path = std::string(cwd);
+        complete_path = std::string(cwd);
     }
     else
     {
         char first_char_argv = argv[0];
         if(&first_char_argv == std::string("/"))
         {
-            path = argv;
+            complete_path = argv;
         }
         else
         {
-            path = std::string(getcwd(cwd, sizeof(cwd))) + "/" + argv;
+            complete_path = std::string(getcwd(cwd, sizeof(cwd))) + "/" + argv;
         }
     }
 }
@@ -108,7 +126,7 @@ void FileEditor::createFileList()
 {
     std::string placeholder;
     int len;
-    for (const auto & entry : fs::recursive_directory_iterator(this->path))
+    for (const auto & entry : fs::recursive_directory_iterator(this->complete_path))
     {
         placeholder = entry.path();
         len = placeholder.size();
@@ -168,12 +186,12 @@ bool FileEditor::isDirectory(std::string path)
 bool FileEditor::doesPathExist()
 {
   struct stat buffer;
-  return (stat (path.c_str(), &buffer) == 0);
+  return (stat (complete_path.c_str(), &buffer) == 0);
 }
 
 // Terminal handling
 /*Exits raw mode at exit. Needs to be outside class to function.*/
-void disableRawMode(void)
+void FileEditor::disableRawMode()
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
     die("tcsetattr");
@@ -183,7 +201,6 @@ void disableRawMode(void)
 void FileEditor::enableRawMode()
 {
     if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
-    atexit(disableRawMode);
     struct termios raw = orig_termios;
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
@@ -565,7 +582,7 @@ int FileEditor::editorReadKey()
 }
 
 /*Processes the available inputs.*/
-void FileEditor::editorProcessKeypress()
+bool FileEditor::editorProcessKeypress()
 {
     int read_key = editorReadKey();
     switch (read_key)
@@ -573,7 +590,11 @@ void FileEditor::editorProcessKeypress()
         case CTRL_KEY('q'):
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
-            exit(0);
+            return false;
+            //free(buffer.b);
+            //editorFlushRows();
+            //clearFileList();
+            //exit(0);
             break;
         //Experimental, needs to flush saved rows.
         case CTRL_KEY('w'):
@@ -582,7 +603,6 @@ void FileEditor::editorProcessKeypress()
             if(file_number >= 0 && file_number < file_list.size)
             {
                 file_number++;
-                debug.send((char*)file_list.p[file_number].path);
                 resetRows();
                 editorOpen(file_list.p[file_number].path);
             }
@@ -621,7 +641,8 @@ void FileEditor::editorProcessKeypress()
             editorMoveCursor(read_key);
             break;
     }
-    
+
+    return true;
 }
 
 /*Adds the default values and makes functions calls

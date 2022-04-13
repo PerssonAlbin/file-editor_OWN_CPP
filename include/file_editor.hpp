@@ -36,10 +36,11 @@ private:
 
     /* Render handling */
     void editorUpdateRow();
+    void clearFileList();
     SendDebug debug;
     /* Path handling */
     int file_number = 0;
-    std::string path;
+    std::string complete_path;
     struct paths
     {
         char* filename;
@@ -79,7 +80,7 @@ private:
     int screencols;
     
     void enableRawMode();
-    //void disableRawMode();
+    void disableRawMode();
     int getWindowSize(int *rows, int *cols);
     void editorDrawRows();
     void editorDrawStatusBar();
@@ -112,7 +113,7 @@ private:
         PAGE_DOWN
     };
     int editorReadKey();
-    void editorProcessKeypress();
+    bool editorProcessKeypress();
     void editorRefreshScreen();
     void editorOpen(char *filename);
     void resetRows();
