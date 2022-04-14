@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/bin/file_editor.out",
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-           
+            "args": [], 
             "launchCompleteCommand": "exec-run",
             "linux": {
               "MIMode": "gdb",
