@@ -3,19 +3,21 @@
 
 int main(int argc, char* argv[])
 {
-    std::string arg_copy = "";
-    if(argc > 1)
-    {
-        arg_copy = argv[1];
-    }
-    else if(argc > 2) 
+    if(argc > 2) 
     {
         std::cout << "Max 2 arguments allowed\n";
         return -1;
     }
+
+    std::string dir_path = "";
+    if(argc > 1)
+    {
+        dir_path = argv[1];
+    }
+ 
     try
     {
-        FileEditor editor(argc, arg_copy);
+        FileEditor editor(argc, dir_path);
         editor.runtime();
     }
     catch(std::invalid_argument& e)
