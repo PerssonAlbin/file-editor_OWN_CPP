@@ -53,6 +53,7 @@ script:
       # L002: Don't use tab characters
       find include -name \*\.hpp | vera++ --rule F001 --rule L001 --rule L002 --error
     fi
+  - make
 
 notifications:
   email: false

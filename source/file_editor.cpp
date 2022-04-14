@@ -310,33 +310,33 @@ void FileEditor::editorDrawMessageBar()
 }
 
 /*Updates the row char string to identify and modify the display of tabs.*/
-void FileEditor::editorUpdateRow()
+void FileEditor::editorUpdateRow(erow *row)
 {
     int tabs = 0;
     int at = E.numrows;
     int j;
 
-    for (j = 0; j < E.row[at].size; j++)
-        if (E.row[at].chars[j] == '\t') tabs++;
+    for (j = 0; j < row->size; j++)
+        if (row->chars[j] == '\t') tabs++;
 
     free(E.row[at].render);
-    E.row[at].render = (char*)malloc(E.row[at].size + tabs*(TAB_STOP - 1) + 1);
+    row->render = (char*)malloc(row->size + tabs*(TAB_STOP - 1) + 1);
     
     int idx = 0;
-    for (j = 0; j < E.row[at].size; j++)
+    for (j = 0; j < row->size; j++)
     {
-        if(E.row[at].chars[j] == '\t')
+        if(row->chars[j] == '\t')
         {
-            E.row[at].render[idx++] = ' ';
-            while(idx % TAB_STOP != 0) E.row[at].render[idx++] = ' ';
+            row->render[idx++] = ' ';
+            while(idx % TAB_STOP != 0) row->render[idx++] = ' ';
         }
         else
         {
-            E.row[at].render[idx++] = E.row[at].chars[j];
+            row->render[idx++] = row->chars[j];
         }
     }
-    E.row[at].render[idx] = '\0';
-    E.row[at].rsize = idx;
+    row->render[idx] = '\0';
+    row->rsize = idx;
 }
 
 /*Appends a char string to a char string inside a row.*/
@@ -351,7 +351,7 @@ void FileEditor::editorAppendRow(char *s, size_t len)
 
     E.row[at].rsize = 0;
     E.row[at].render = NULL;
-    editorUpdateRow();
+    editorUpdateRow(&E.row[at]);
 
     E.numrows++;
 }
@@ -468,6 +468,29 @@ int FileEditor::editorRowCxToRx()
         rx++;
     }
     return rx;
+}
+
+// Insert handling
+void FileEditor::editorRowInsertChar(int at, int input) {
+  if (at < 0 || at > E.row[c.y].size) at = E.row[c.y].size;
+  E.row[c.y].chars = (char*)realloc(E.row[c.y].chars, E.row[c.y].size + 2);
+  debug.send(E.row[c.y].chars);
+  debug.send(c.y);
+  debug.send(at);
+  debug.send(E.row[c.y].chars[at + 1]);
+  memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
+  E.row[c.y].size++;
+  E.row[c.y].chars[at] = input;
+  debug.send(E.row[c.y].chars);
+  editorUpdateRow(&E.row[c.y]);
+}
+
+void FileEditor::editorInsertChar(int read_key) {
+  if (c.y == E.numrows) {
+    editorAppendRow((char*)"", 0);
+  }
+  editorRowInsertChar(c.x, read_key);
+  c.x++;
 }
 
 // Input handling
@@ -639,6 +662,9 @@ bool FileEditor::editorProcessKeypress()
         case ARROW_LEFT:
         case ARROW_RIGHT:
             editorMoveCursor(read_key);
+            break;
+        default:
+            editorInsertChar(read_key);
             break;
     }
 

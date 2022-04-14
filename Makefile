@@ -36,7 +36,7 @@ $(BUILD)main.o: $(SOURCE)main.cpp
 		g++ $(CPPFLAGS) -c $(SOURCE)main.cpp -I $(INCLUDES) -o $(BUILD)main.o
 
 .PHONY: debug
-debug: $(SOURCE)recv_debug.cpp ## Debug build
+debug: $(SOURCE)recv_debug.cpp ## Build debug receiver
 		g++ $(CPPFLAGS) $(SOURCE)recv_debug.cpp -o $(BIN)recv.out
 
 .PHONY: clean
