@@ -2,4 +2,6 @@
 *.txt
 *.o
 *.exe
-**\.vscode
+
+.vscode/*
+!.vscode/launch.json
