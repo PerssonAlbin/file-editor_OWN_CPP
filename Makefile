@@ -24,7 +24,7 @@ all: build
 .PHONY: build
 build: $(EXECUTABLE) ## Build file editor
 $(EXECUTABLE): $(BUILD)file_editor.o $(BUILD)send_debug.o $(BUILD)main.o
-		g++ $(BUILD)main.o $(BUILD)file_editor.o $(BUILD)send_debug.o -o $(EXECUTABLE)
+		g++ $(BUILD)main.o $(BUILD)file_editor.o $(BUILD)send_debug.o -I $(INCLUDES) -o $(EXECUTABLE)
 
 $(BUILD)send_debug.o: $(SOURCE)send_debug.cpp $(INCLUDES)send_debug.hpp
 		g++ $(CPPFLAGS) -c $(SOURCE)send_debug.cpp -I $(INCLUDES) -o $(BUILD)send_debug.o
@@ -36,7 +36,7 @@ $(BUILD)main.o: $(SOURCE)main.cpp
 		g++ $(CPPFLAGS) -c $(SOURCE)main.cpp -I $(INCLUDES) -o $(BUILD)main.o
 
 .PHONY: debug
-debug: $(SOURCE)recv_debug.cpp ## Debug build
+debug: $(SOURCE)recv_debug.cpp ## Build debug receiver
 		g++ $(CPPFLAGS) $(SOURCE)recv_debug.cpp -o $(BIN)recv.out
 
 .PHONY: clean

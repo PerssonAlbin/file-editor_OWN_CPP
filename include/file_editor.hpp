@@ -35,7 +35,6 @@ private:
     void bufferAppend(const char *s, int len);
 
     /* Render handling */
-    void editorUpdateRow();
     void clearFileList();
     SendDebug debug;
     /* Path handling */
@@ -78,7 +77,7 @@ private:
     editorConfig E;
     int screenrows;
     int screencols;
-    
+    void editorUpdateRow(erow *row, int at);
     void enableRawMode();
     void disableRawMode();
     int getWindowSize(int *rows, int *cols);
@@ -99,6 +98,9 @@ private:
     int getCursorPosition(int *rows, int *cols);
     void editorMoveCursor(int key);
     int editorRowCxToRx();
+    /*Insert handling*/
+    void editorRowInsertChar(int at, int input);
+    void editorInsertChar(int read_key);
 
     /* Input handling */
     enum editorKey {
