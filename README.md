@@ -8,6 +8,10 @@
 ## General info
 Simple command-line editor. Takes a directory as an argument and opens the files in that folder. Writing to files will be added in a later version, for now only reads files.
 
+## Prerequisites
+Make sure you have installed all of the following prerequisites on your development machine:
+* g++ - In order to compile the file editor
+
 ## Commands
 
 | Commands     ||
