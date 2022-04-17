@@ -1,5 +1,5 @@
 // Copyright 2022 Albin Persson
-#include "include/file_editor.hpp"
+#include "file_editor.hpp"
 
 #define _BSD_SOURCE
 
@@ -22,27 +22,26 @@ void die(const char *s) {
 FileEditor::FileEditor(int argc, std::string argv) {
     E.statusmsg[0] = '\0';
     formatPath(argc, argv);
-    if(doesPathExist()) {
+    if (doesPathExist()) {
         this->createFileList();
     } else {
         throw std::invalid_argument("Path could not be found");
     }
 }
 
-//Destructor functions
+// Destructor functions
 
 void FileEditor::clearFileList() {
     int x = 0;
-    while(file_list.size > x) {
+    while (file_list.size > x) {
         free(file_list.p[x].filename);
         free(file_list.p[x].path);
         x += 1;
     }
-    
     free(file_list.p);
 }
 
-//Does not seem to be called
+// Does not seem to be called
 FileEditor::~FileEditor() {
     free(buffer.b);
     editorFlushRows();
@@ -53,13 +52,13 @@ FileEditor::~FileEditor() {
 /* Main function */
 void FileEditor::runtime() {
     enableRawMode();
-    if(getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
-    screenrows -= 2; //Compensate for having a status bar
-    
+    if (getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
+    // Compensate for having a status bar
+    screenrows -= 2;
     editorOpen(file_list.p[file_number].path);
     editorSetStatusMessage("HELP: Ctrl-Q = quit");
     bool loop = true;
-    while(loop) {
+    while (loop) {
         editorRefreshScreen();
         loop = editorProcessKeypress();
     }
@@ -74,7 +73,7 @@ The size of the char string
 void FileEditor::bufferAppend(const char *s, int len) {
     char *new_buffer = (char*)realloc(buffer.b, buffer.len + len);
 
-    if(new_buffer == NULL) return;
+    if (new_buffer == NULL) return;
     memcpy(&new_buffer[buffer.len], s, len);
     buffer.b = new_buffer;
     buffer.len += len;
@@ -84,12 +83,12 @@ void FileEditor::bufferAppend(const char *s, int len) {
 /*Fixes the path taken as argument when starting the program.*/
 void FileEditor::formatPath(int argc, std::string argv) {
     char cwd[256];
-    if(argc == 1 || (argc == 2 && argv == ".")) {
+    if (argc == 1 || (argc == 2 && argv == ".")) {
         getcwd(cwd, sizeof(cwd));
         complete_path = std::string(cwd);
     } else {
         char first_char_argv = argv[0];
-        if(&first_char_argv == std::string("/")) {
+        if (&first_char_argv == std::string("/")) {
             complete_path = argv;
         } else {
             complete_path = std::string(getcwd(cwd, sizeof(cwd))) + "/" + argv;
@@ -102,23 +101,27 @@ directories have been added to file_list.*/
 void FileEditor::createFileList() {
     std::string placeholder;
     int len;
-    for (const auto & entry : fs::recursive_directory_iterator(this->complete_path)) {
+    for (const auto & entry :
+        fs::recursive_directory_iterator(this->complete_path)) {
         placeholder = entry.path();
         len = placeholder.size();
-        if(isDirectory(placeholder)) {
-            //Means its a directoy, will add this option later
+        if (isDirectory(placeholder)) {
+            // Means its a directoy, will add this option later
         } else {
-            //Creates a new path entry
-            file_list.p = (paths*)realloc(file_list.p, sizeof(paths) * (file_list.size + 1));
+            // Creates a new path entry
+            file_list.p = (paths*)realloc(file_list.p,
+                sizeof(paths) * (file_list.size + 1));
             std::string filename;
-            if(placeholder.size() > 20) {
+            if (placeholder.size() > 20) {
                 int slash = placeholder.find_last_of('/');
                 filename = placeholder.substr(slash+1);
             } else {
                 filename = placeholder;
             }
-            file_list.p[file_list.size].filename = (char*)malloc(filename.size() + 1);
-            memcpy(file_list.p[file_list.size].filename, filename.c_str(), filename.size());
+            file_list.p[file_list.size].filename =
+                (char*)malloc(filename.size() + 1);
+            memcpy(file_list.p[file_list.size].filename,
+                filename.c_str(), filename.size());
             file_list.p[file_list.size].filename[filename.size()] = '\0';
 
             file_list.p[file_list.size].path = (char*)malloc(len + 1);
@@ -127,22 +130,21 @@ void FileEditor::createFileList() {
             file_list.p[file_list.size].size = len;
             file_list.size++;
         }
-        
     }
 }
 /*Returns true if the path given is a directory*/
 bool FileEditor::isDirectory(std::string path) {
     struct stat s;
-    if(stat(path.c_str(), &s) == 0) {
-        if( s.st_mode & S_IFDIR ) {
-            //it's a directory
+    if (stat(path.c_str(), &s) == 0) {
+        if (s.st_mode & S_IFDIR) {
+            // it's a directory
             return true;
-        } else if( s.st_mode & S_IFREG ) {
-            //it's a file
+        } else if (s.st_mode & S_IFREG) {
+            // it's a file
             return false;
         }
     }
-    //Not a file or a directory
+    // Not a file or a directory
     return -1;
 }
 
@@ -175,8 +177,8 @@ void FileEditor::enableRawMode() {
 /*Gets current size of the terminal window.*/
 int FileEditor::getWindowSize(int *rows, int *cols) {
     struct winsize ws;
-    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-        if(write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+        if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
         return getCursorPosition(rows, cols);
     } else {
         *cols = ws.ws_col;
@@ -223,15 +225,16 @@ void FileEditor::editorDrawStatusBar() {
     bufferAppend("\x1b[7m", 4);
     char status[80];
     char rstatus[80];
+
     int len = snprintf(status, sizeof(status), "%.20s",
-        file_list.p[file_number].filename ? file_list.p[file_number].filename : "[No Name]");
+        file_list.p[file_number].filename ?
+        file_list.p[file_number].filename : "[No Name]");
     int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
         c.y +1, E.numrows);
     if (len > screencols) len = screencols;
     bufferAppend(status, len);
-    
     while (len < screencols) {
-        if(screencols - len == rlen) {
+        if (screencols - len == rlen) {
             bufferAppend(rstatus, rlen);
             break;
         } else {
@@ -247,29 +250,28 @@ void FileEditor::editorDrawStatusBar() {
 void FileEditor::editorDrawMessageBar() {
     bufferAppend("\x1b[K", 3);
     int msglen = strlen(E.statusmsg);
-    if(msglen > screencols) msglen = screencols;
-    if(msglen && time(NULL) - E.statusmsg_time < 5)
+    if (msglen > screencols) msglen = screencols;
+    if (msglen && time(NULL) - E.statusmsg_time < 5)
         bufferAppend(E.statusmsg, msglen);
 }
 
 /*Updates the row char string to identify and modify the display of tabs.*/
-void FileEditor::editorUpdateRow(erow *row)
-{
+void FileEditor::editorUpdateRow(erow *row, int at) {
     int tabs = 0;
-    int at = E.numrows;
+    // int at = E.numrows;
     int j;
-
-    for (j = 0; j < row->size; j++)
+    debug.send(row->chars);
+    for (j = 0; j < row->size; j++) {
         if (row->chars[j] == '\t') tabs++;
+    }
 
     free(E.row[at].render);
     row->render = (char*)malloc(row->size + tabs*(TAB_STOP - 1) + 1);
-    
     int idx = 0;
     for (j = 0; j < row->size; j++) {
-        if(row->chars[j] == '\t') {
+        if (row->chars[j] == '\t') {
             row->render[idx++] = ' ';
-            while(idx % TAB_STOP != 0) row->render[idx++] = ' ';
+            while (idx % TAB_STOP != 0) row->render[idx++] = ' ';
         } else {
             row->render[idx++] = row->chars[j];
         }
@@ -289,28 +291,27 @@ void FileEditor::editorAppendRow(char *s, size_t len) {
 
     E.row[at].rsize = 0;
     E.row[at].render = NULL;
-    editorUpdateRow(&E.row[at]);
-
+    editorUpdateRow(&E.row[at], at);
     E.numrows++;
 }
 
 /*Scrolls if the cursor is at the edge of the screen.*/
 void FileEditor::editorScroll() {
     c.rx = 0;
-    if(c.y < E.numrows) {
+    if (c.y < E.numrows) {
         c.rx = editorRowCxToRx();
     }
-    //Vertical scrolling
-    if(c.y < E.rowoff) {
+    // Vertical scrolling
+    if (c.y < E.rowoff) {
         E.rowoff = c.y;
     }
-    if(c.y >= E.rowoff + screenrows) {
+    if (c.y >= E.rowoff + screenrows) {
         E.rowoff = c.y - screenrows + 1;
     }
-    if(c.rx < E.coloff) {
+    if (c.rx < E.coloff) {
         E.coloff = c.rx;
     }
-    if(c.rx >= E.coloff + screencols) {
+    if (c.rx >= E.coloff + screencols) {
         E.coloff = c.rx - screencols + 1;
     }
 }
@@ -348,36 +349,28 @@ void FileEditor::editorMoveCursor(int key) {
     /* Moves cursor based on cases it gets from */
 
     erow *row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
-    switch (key)
-    {
+    switch (key) {
         case ARROW_LEFT:
-            if(c.x != 0)
-            {
+            if (c.x != 0) {
                 c.x--;
-            }
-            else if (c.y > 0)
-            {
+            } else if (c.y > 0) {
                 c.y--;
                 c.x = E.row[c.y].size;
             }
             break;
         case ARROW_RIGHT:
-            if(row && c.x < row->size)
-            {
+            if (row && c.x < row->size) {
                 c.x++;
-            }
-            // Not sure I want this part.
-            else if(row && c.x == row->size)
-            {
+            } else if (row && c.x == row->size) {
                 c.y++;
                 c.x = 0;
             }
             break;
         case ARROW_UP:
-            if(c.y != 0) c.y--;
+            if (c.y != 0) c.y--;
             break;
         case ARROW_DOWN:
-            if(c.y < E.numrows) c.y++;
+            if (c.y < E.numrows) c.y++;
             break;
     }
     row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
@@ -399,29 +392,30 @@ int FileEditor::editorRowCxToRx() {
 }
 
 // Insert handling
-/*
+
 void FileEditor::editorRowInsertChar(int at, int input) {
   if (at < 0 || at > E.row[c.y].size) at = E.row[c.y].size;
-  E.row[c.y].chars = (char*)realloc(E.row[c.y].chars, E.row[c.y].size + 2);
-  debug.send(E.row[c.y].chars);
-  debug.send(c.y);
   debug.send(at);
-  debug.send(E.row[c.y].chars[at + 1]);
+  debug.send(E.row[c.y].size);
+  E.row[c.y].chars = (char*)realloc(E.row[c.y].chars, E.row[c.y].size + 2);
+  debug.send((char*)"before mem move");
   memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
+  debug.send((char*)"after mem move");
   E.row[c.y].size++;
   E.row[c.y].chars[at] = input;
-  debug.send(E.row[c.y].chars);
-  editorUpdateRow(&E.row[c.y]);
+  debug.send((char*)"after reassign");
+  editorUpdateRow(&E.row[c.y], c.y);
+  debug.send((char*)"got here?");
 }
 
 void FileEditor::editorInsertChar(int read_key) {
-  if (c.y == E.numrows) {
-    editorAppendRow((char*)"", 0);
-  }
-  editorRowInsertChar(c.x, read_key);
-  c.x++;
+    if (c.y == E.numrows) {
+        editorAppendRow((char*)"", 0);
+    }
+    editorRowInsertChar(c.x, read_key);
+    c.x++;
 }
-*/
+
 // Input handling
 /*Opens a file taken as argument and send the content to the buffer.*/
 void FileEditor::editorOpen(char *filename) {
@@ -435,7 +429,6 @@ void FileEditor::editorOpen(char *filename) {
         while (linelen > 0 && (line[linelen - 1] == '\n' ||
                                 line[linelen - 1] == '\r'))
             linelen--;
-        
         editorAppendRow(line, linelen);
     }
     free(line);
@@ -456,7 +449,7 @@ void FileEditor::resetRows() {
 /*Frees all the rows generated from file*/
 void FileEditor::editorFlushRows() {
     int x = 0;
-    while(x < E.numrows) {
+    while (x < E.numrows) {
         free(E.row[x].chars);
         free(E.row[x].render);
         x += 1;
@@ -472,7 +465,7 @@ int FileEditor::editorReadKey() {
     while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
         if (nread == -1 && errno != EAGAIN) die("read");
     }
-    //Special case for arrow keys
+    // Special case for arrow keys
     if (c == '\x1b') {
         char seq[3];
         if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
@@ -481,8 +474,7 @@ int FileEditor::editorReadKey() {
             if (seq[1] >= '0' && seq[1] <= '9') {
                 if (read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
                 if (seq[2] == '~') {
-                    switch (seq[1])
-                    {
+                    switch (seq[1]) {
                         case '1': return HOME_KEY;
                         case '3': return DEL_KEY;
                         case '4': return END_KEY;
@@ -493,8 +485,7 @@ int FileEditor::editorReadKey() {
                     }
                 }
             } else {
-                switch (seq[1])
-                {
+                switch (seq[1]) {
                     case 'A': return ARROW_UP;
                     case 'B': return ARROW_DOWN;
                     case 'C': return ARROW_RIGHT;
@@ -504,8 +495,7 @@ int FileEditor::editorReadKey() {
                 }
             }
         } else if (seq[0] == 'O') {
-            switch(seq[1])
-            {
+            switch (seq[1]) {
                 case 'H': return HOME_KEY;
                 case 'F': return END_KEY;
             }
@@ -556,7 +546,8 @@ bool FileEditor::editorProcessKeypress() {
 
                 int times = screenrows;
                 while (times--)
-                    editorMoveCursor(read_key == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+                    editorMoveCursor(read_key == PAGE_UP ?
+                        ARROW_UP : ARROW_DOWN);
             }
             break;
         case ARROW_UP:

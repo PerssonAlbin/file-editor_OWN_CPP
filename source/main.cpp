@@ -1,6 +1,6 @@
 // Copyright 2022 Albin Persson
 #include <iostream>
-#include "include/file_editor.hpp"
+#include "file_editor.hpp"
 
 int main(int argc, char* argv[]) {
     std::string arg_copy = "";

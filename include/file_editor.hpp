@@ -77,7 +77,7 @@ private:
     editorConfig E;
     int screenrows;
     int screencols;
-    void editorUpdateRow(erow *row);
+    void editorUpdateRow(erow *row, int at);
     void enableRawMode();
     void disableRawMode();
     int getWindowSize(int *rows, int *cols);
