@@ -1,5 +1,5 @@
 
-# file-editor_OWN_CPP [![Build Status](https://app.travis-ci.com/DenmarkPolice/file-editor_OWN_CPP.svg?branch=main)](https://app.travis-ci.com/DenmarkPolice/file-editor_OWN_CPP)
+# file-editor_OWN_CPP [![Linux build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml)
 
 ## Table of contents
 * [General info](#general-info)
