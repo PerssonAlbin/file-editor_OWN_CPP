@@ -1,6 +1,7 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Linux build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml)
 
-# file-editor_OWN_CPP [![Linux build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml)
-
+# file-editor_OWN_CPP 
 ## Table of contents
 * [General info](#general-info)
 * [Commands](#Commands)
@@ -18,3 +19,9 @@ Make sure you have installed all of the following prerequisites on your developm
 |--------------|-----------|
 | Exit program | Ctrl-Q    |
 | Switch file  | Ctrl-W    |
+
+## License
+
+Copyright (c) 2022 Albin Persson
+
+This work (source code) is licensed under the [GNU General Public License v3.0](./LICENSE).
