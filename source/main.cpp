@@ -3,13 +3,13 @@
 #include "file_editor.hpp"
 
 int main(int argc, char* argv[]) {
-    if(argc > 2) {
+    if (argc > 2) {
         std::cout << "Max 2 arguments allowed\n";
         return -1;
     }
 
     std::string dir_path = "";
-    if(argc > 1) {
+    if (argc > 1) {
         dir_path = argv[1];
     }
     try {
