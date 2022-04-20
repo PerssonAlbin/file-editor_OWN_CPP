@@ -1,3 +1,4 @@
+---
 #################################
 #################################
 ## Super Linter GitHub Actions ##
@@ -40,7 +41,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
+          # Full git history is
+          # needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
       ################################
@@ -49,6 +51,6 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter/slim@v4
         env:
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@
 [![Linux build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml)
 [![Lint Code](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml)
 
-# file-editor_OWN_CPP 
+# file-editor_OWN_CPP
 ## Table of contents
 * [General info](#general-info)
 * [Commands](#Commands)
