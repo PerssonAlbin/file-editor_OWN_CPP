@@ -1,5 +1,5 @@
 // Copyright 2022 Albin Persson
-#include "file_editor.hpp"
+#include "include/file_editor.hpp"
 
 #define _BSD_SOURCE
 
@@ -71,7 +71,8 @@ Char string to add to buffer
 The size of the char string
 */
 void FileEditor::bufferAppend(const char *s, int len) {
-    char *new_buffer = (char*)realloc(buffer.b, buffer.len + len);
+    char *new_buffer = reinterpret_cast<char*>(
+        realloc(buffer.b, buffer.len + len));
 
     if (new_buffer == NULL) return;
     memcpy(&new_buffer[buffer.len], s, len);
@@ -109,8 +110,8 @@ void FileEditor::createFileList() {
             // Means its a directoy, will add this option later
         } else {
             // Creates a new path entry
-            file_list.p = (paths*)realloc(file_list.p,
-                sizeof(paths) * (file_list.size + 1));
+            file_list.p = reinterpret_cast<paths*>(
+                realloc(file_list.p, sizeof(paths) * (file_list.size + 1)));
             std::string filename;
             if (placeholder.size() > 20) {
                 int slash = placeholder.find_last_of('/');
@@ -118,13 +119,14 @@ void FileEditor::createFileList() {
             } else {
                 filename = placeholder;
             }
-            file_list.p[file_list.size].filename =
-                (char*)malloc(filename.size() + 1);
+            file_list.p[file_list.size].filename = reinterpret_cast<char*>(
+                malloc(filename.size() + 1));
             memcpy(file_list.p[file_list.size].filename,
                 filename.c_str(), filename.size());
             file_list.p[file_list.size].filename[filename.size()] = '\0';
 
-            file_list.p[file_list.size].path = (char*)malloc(len + 1);
+            file_list.p[file_list.size].path = reinterpret_cast<char*>(
+                malloc(len + 1));
             memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
             file_list.p[file_list.size].path[len] = '\0';
             file_list.p[file_list.size].size = len;
@@ -260,13 +262,13 @@ void FileEditor::editorUpdateRow(erow *row, int at) {
     int tabs = 0;
     // int at = E.numrows;
     int j;
-    debug.send(row->chars);
     for (j = 0; j < row->size; j++) {
         if (row->chars[j] == '\t') tabs++;
     }
 
     free(E.row[at].render);
-    row->render = (char*)malloc(row->size + tabs*(TAB_STOP - 1) + 1);
+    row->render = reinterpret_cast<char*>(
+        malloc(row->size + tabs*(TAB_STOP - 1) + 1));
     int idx = 0;
     for (j = 0; j < row->size; j++) {
         if (row->chars[j] == '\t') {
@@ -276,16 +278,18 @@ void FileEditor::editorUpdateRow(erow *row, int at) {
             row->render[idx++] = row->chars[j];
         }
     }
+    debug.send(row->render);
     row->render[idx] = '\0';
     row->rsize = idx;
 }
 
 /*Appends a char string to a char string inside a row.*/
 void FileEditor::editorAppendRow(char *s, size_t len) {
-    E.row = (erow*)realloc(E.row, sizeof(erow) * (E.numrows + 1));
+    E.row = reinterpret_cast<erow*>(
+        realloc(E.row, sizeof(erow) * (E.numrows + 1)));
     int at = E.numrows;
     E.row[at].size = len;
-    E.row[at].chars = (char*)malloc(len + 1);
+    E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
     memcpy(E.row[at].chars, s, len);
     E.row[at].chars[len] = '\0';
 
@@ -394,23 +398,19 @@ int FileEditor::editorRowCxToRx() {
 // Insert handling
 
 void FileEditor::editorRowInsertChar(int at, int input) {
-  if (at < 0 || at > E.row[c.y].size) at = E.row[c.y].size;
-  debug.send(at);
-  debug.send(E.row[c.y].size);
-  E.row[c.y].chars = (char*)realloc(E.row[c.y].chars, E.row[c.y].size + 2);
-  debug.send((char*)"before mem move");
-  memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
-  debug.send((char*)"after mem move");
-  E.row[c.y].size++;
-  E.row[c.y].chars[at] = input;
-  debug.send((char*)"after reassign");
-  editorUpdateRow(&E.row[c.y], c.y);
-  debug.send((char*)"got here?");
+    if (at < 0 || at > E.row[c.y].size) at = E.row[c.y].size;
+    E.row[c.y].chars = reinterpret_cast<char*>(
+        realloc(E.row[c.y].chars, E.row[c.y].size + 2));
+    memmove(&E.row[c.y].chars[at + 1],
+        &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
+    E.row[c.y].size++;
+    E.row[c.y].chars[at] = input;
+    editorUpdateRow(&E.row[c.y], c.y);
 }
 
 void FileEditor::editorInsertChar(int read_key) {
     if (c.y == E.numrows) {
-        editorAppendRow((char*)"", 0);
+        editorAppendRow(const_cast<char*>(""), 0);
     }
     editorRowInsertChar(c.x, read_key);
     c.x++;
@@ -586,5 +586,5 @@ void FileEditor::editorRefreshScreen() {
 
     write(STDOUT_FILENO, buffer.b, buffer.len);
     buffer.len = 0;
-    buffer.b = (char*)realloc(buffer.b, 0);
+    buffer.b = reinterpret_cast<char*>(realloc(buffer.b, 0));
 }

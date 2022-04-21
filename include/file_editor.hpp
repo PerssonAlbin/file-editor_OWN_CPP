@@ -1,7 +1,8 @@
-#ifndef FILE_EDITOR_H
-#define FILE_EDITOR_H
+// Copyright 2022 Albin Persson
+#ifndef INCLUDE_FILE_EDITOR_HPP_
+#define INCLUDE_FILE_EDITOR_HPP_
 
-#include "send_debug.hpp"
+
 
 #include <termios.h>
 #include <sys/ioctl.h>
@@ -15,6 +16,8 @@
 #include <vector>
 #include <filesystem>
 
+#include "include/send_debug.hpp"
+
 #ifdef WINDOWS
     #include <direct.h>
     #include <windows.h>
@@ -22,13 +25,11 @@
     #include <unistd.h>
 #endif
 
-class FileEditor
-{
-private:
+class FileEditor {
+ private:
     /* Append buffer */
-    struct abuf
-    {
-        char *b = (char*)malloc(0);
+    struct abuf {
+        char *b = reinterpret_cast<char*>(malloc(0));
         int len = 0;
     };
     abuf buffer;
@@ -40,15 +41,13 @@ private:
     /* Path handling */
     int file_number = 0;
     std::string complete_path;
-    struct paths
-    {
+    struct paths {
         char* filename;
         char* path;
         int size;
     };
-    struct file_path_list
-    {
-        paths* p = (paths*)malloc(0);
+    struct file_path_list {
+        paths* p = reinterpret_cast<paths*>(malloc(0));
         int size = 0;
     };
     file_path_list file_list;
@@ -58,15 +57,13 @@ private:
     bool doesPathExist();
 
     /* Terminal handling */
-    typedef struct erow
-    {
+    typedef struct erow {
         int rsize = 0;
         int size = 0;
         char *chars;
         char *render;
     } erow;
-    struct editorConfig
-    {
+    struct editorConfig {
         int numrows = 0;
         erow *row = NULL;
         int rowoff = 0;
@@ -92,13 +89,13 @@ private:
     struct cursor {
         int x = 0;
         int y = 0;
-        int rx = 0; // Position correction for tabs
+        int rx = 0;  // Position correction for tabs
     };
     cursor c;
     int getCursorPosition(int *rows, int *cols);
     void editorMoveCursor(int key);
     int editorRowCxToRx();
-    /*Insert handling*/
+    /* Insert handling */
     void editorRowInsertChar(int at, int input);
     void editorInsertChar(int read_key);
 
@@ -121,7 +118,7 @@ private:
     void resetRows();
     void editorFlushRows();
 
-public:
+ public:
     /* Init */
     FileEditor(int argc, std::string argv);
     ~FileEditor();
@@ -130,4 +127,4 @@ public:
     void runtime();
 };
 
-#endif
+#endif  // INCLUDE_FILE_EDITOR_HPP_
