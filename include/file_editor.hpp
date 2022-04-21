@@ -29,7 +29,7 @@ class FileEditor {
  private:
     /* Append buffer */
     struct abuf {
-        char *b = (char*)malloc(0);
+        char *b = reinterpret_cast<char*>(malloc(0));
         int len = 0;
     };
     abuf buffer;
@@ -47,7 +47,7 @@ class FileEditor {
         int size;
     };
     struct file_path_list {
-        paths* p = (paths*)malloc(0);
+        paths* p = reinterpret_cast<paths*>(malloc(0));
         int size = 0;
     };
     file_path_list file_list;
@@ -89,7 +89,7 @@ class FileEditor {
     struct cursor {
         int x = 0;
         int y = 0;
-        int rx = 0; // Position correction for tabs
+        int rx = 0;  // Position correction for tabs
     };
     cursor c;
     int getCursorPosition(int *rows, int *cols);
