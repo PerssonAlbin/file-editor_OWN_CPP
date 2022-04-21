@@ -35,7 +35,7 @@ void SendDebug::send(int input) {
     std::ostringstream n_str;
     n_str << input;
     std::string input_str = n_str.str();
-    
+
     char copy[200];
     memcpy(copy, input_str.c_str(), input_str.size());
 
