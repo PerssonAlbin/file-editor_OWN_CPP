@@ -14,9 +14,10 @@
 
 class SendDebug {
  public:
+    int preSend();
     void send(char input[200]);
-    void send(std::string input);
     void send(int input);
+    void postSend(char input[200], int msqid);
     SendDebug();
  private:
     struct my_msgbuf {

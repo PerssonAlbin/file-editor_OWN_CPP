@@ -278,6 +278,7 @@ void FileEditor::editorUpdateRow(erow *row, int at) {
             row->render[idx++] = row->chars[j];
         }
     }
+    debug.send(row->render);
     row->render[idx] = '\0';
     row->rsize = idx;
 }
@@ -400,7 +401,8 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     if (at < 0 || at > E.row[c.y].size) at = E.row[c.y].size;
     E.row[c.y].chars = reinterpret_cast<char*>(
         realloc(E.row[c.y].chars, E.row[c.y].size + 2));
-    memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
+    memmove(&E.row[c.y].chars[at + 1],
+        &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
     E.row[c.y].size++;
     E.row[c.y].chars[at] = input;
     editorUpdateRow(&E.row[c.y], c.y);
