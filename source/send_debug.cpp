@@ -1,5 +1,5 @@
 // Copyright 2022 Albin Persson
-#include "send_debug.hpp"
+#include "include/send_debug.hpp"
 
 #define PERMS 0644
 

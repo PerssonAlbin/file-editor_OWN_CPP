@@ -1,7 +1,7 @@
 ifeq ($(OS), Windows_NT)
     BIN := bin\\
     BUILD := build\\
-	INCLUDES := include\\
+    INCLUDES := include\\
     SOURCE := source\\
     DELETE := del
 
@@ -24,16 +24,16 @@ all: build
 .PHONY: build
 build: $(EXECUTABLE) ## Build file editor
 $(EXECUTABLE): $(BUILD)file_editor.o $(BUILD)send_debug.o $(BUILD)main.o
-		g++ $(BUILD)main.o $(BUILD)file_editor.o $(BUILD)send_debug.o -I $(INCLUDES) -o $(EXECUTABLE)
+		g++ $(BUILD)main.o $(BUILD)file_editor.o $(BUILD)send_debug.o -I ./ -o $(EXECUTABLE)
 
 $(BUILD)send_debug.o: $(SOURCE)send_debug.cpp $(INCLUDES)send_debug.hpp
-		g++ $(CPPFLAGS) -c $(SOURCE)send_debug.cpp -I $(INCLUDES) -o $(BUILD)send_debug.o
+		g++ $(CPPFLAGS) -c $(SOURCE)send_debug.cpp -I ./ -o $(BUILD)send_debug.o
 
 $(BUILD)file_editor.o: $(SOURCE)file_editor.cpp $(INCLUDES)file_editor.hpp
-		g++ $(CPPFLAGS) -c $(SOURCE)file_editor.cpp -I $(INCLUDES) -o $(BUILD)file_editor.o
+		g++ $(CPPFLAGS) -c $(SOURCE)file_editor.cpp -I ./ -o $(BUILD)file_editor.o
 
 $(BUILD)main.o: $(SOURCE)main.cpp
-		g++ $(CPPFLAGS) -c $(SOURCE)main.cpp -I $(INCLUDES) -o $(BUILD)main.o
+		g++ $(CPPFLAGS) -c $(SOURCE)main.cpp -I ./ -o $(BUILD)main.o
 
 .PHONY: debug
 debug: $(SOURCE)recv_debug.cpp ## Build debug receiver

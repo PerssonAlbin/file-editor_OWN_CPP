@@ -1,6 +1,6 @@
 // Copyright 2022 Albin Persson
 #include <iostream>
-#include "file_editor.hpp"
+#include "include/file_editor.hpp"
 
 int main(int argc, char* argv[]) {
     if (argc > 2) {

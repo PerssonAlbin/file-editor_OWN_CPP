@@ -1,5 +1,5 @@
 // Copyright 2022 Albin Persson
-#include "file_editor.hpp"
+#include "include/file_editor.hpp"
 
 #define _BSD_SOURCE
 
