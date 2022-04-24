@@ -10,13 +10,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdarg.h>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <filesystem>
-
-#include "include/send_debug.hpp"
 
 #ifdef WINDOWS
     #include <direct.h>
@@ -37,7 +36,6 @@ class FileEditor {
 
     /* Render handling */
     void clearFileList();
-    SendDebug debug;
     /* Path handling */
     int file_number = 0;
     std::string complete_path;
@@ -54,7 +52,9 @@ class FileEditor {
     void formatPath(int argc, std::string argv);
     void createFileList();
     bool isDirectory(std::string path);
-    bool doesPathExist();
+    bool pathExist();
+    char* editorRowToString(int* buflen);
+    void editorSave();
 
     /* Terminal handling */
     typedef struct erow {
@@ -101,6 +101,7 @@ class FileEditor {
 
     /* Input handling */
     enum editorKey {
+        BACKSPACE = 127,
         ARROW_LEFT = 3330,
         ARROW_RIGHT,
         ARROW_UP,

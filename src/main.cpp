@@ -7,7 +7,6 @@ int main(int argc, char* argv[]) {
         std::cout << "Max 2 arguments allowed\n";
         return -1;
     }
-
     std::string dir_path = "";
     if (argc > 1) {
         dir_path = argv[1];

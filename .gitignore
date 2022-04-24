@@ -1,7 +1,19 @@
-*.out
-*.txt
+# Compiled objects
 *.o
 *.exe
+*.out
 
-.vscode/*
+# Generated files
+*.txt
+*.cmake
+Makefile
+build/*
+
+# Project folders
+**/.idea
+**/CMakeFiles
+**/.vscode
+
+# Exceptions
 !.vscode/launch.json
+!CMakeLists.txt
