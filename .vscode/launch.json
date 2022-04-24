@@ -8,7 +8,7 @@
             "name": "C++ Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/file_editor.out",
+            "program": "${workspaceFolder}/bin/file-editor.out",
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             "args": [], 

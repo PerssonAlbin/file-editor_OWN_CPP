@@ -121,7 +121,7 @@ class FileEditor {
 
  public:
     /* Init */
-    FileEditor(int argc, std::string argv);
+    FileEditor(std::string argv);
     ~FileEditor();
 
     /* Main function */

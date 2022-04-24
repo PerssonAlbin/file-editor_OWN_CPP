@@ -18,9 +18,9 @@ void die(const char *s) {
 }
 
 /* Init */
-FileEditor::FileEditor(int argc, std::string argv) {
+FileEditor::FileEditor(std::string argv) {
     E.statusmsg[0] = '\0';
-    formatPath(argc, argv);
+    complete_path = argv;
     if (pathExist()) {
         this->createFileList();
     } else {
@@ -80,21 +80,6 @@ void FileEditor::bufferAppend(const char *s, int len) {
 }
 
 // File IO
-/*Fixes the path taken as argument when starting the program.*/
-void FileEditor::formatPath(int argc, std::string argv) {
-    char cwd[256];
-    if (argc == 1 || (argc == 2 && argv == ".")) {
-        getcwd(cwd, sizeof(cwd));
-        complete_path = std::string(cwd);
-    } else {
-        char first_char_argv = argv[0];
-        if (&first_char_argv == std::string("/")) {
-            complete_path = argv;
-        } else {
-            complete_path = std::string(getcwd(cwd, sizeof(cwd))) + "/" + argv;
-        }
-    }
-}
 
 /*Iterates through the current path until all files and
 directories have been added to file_list.*/
@@ -133,6 +118,7 @@ void FileEditor::createFileList() {
         }
     }
 }
+
 /*Returns true if the path given is a directory*/
 bool FileEditor::isDirectory(std::string path) {
     struct stat s;
