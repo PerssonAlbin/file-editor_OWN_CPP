@@ -4,7 +4,6 @@
 #define _BSD_SOURCE
 
 #define CTRL_KEY(k) ((k) & 0x1f)
-#define EDITOR_VERSION "0.0.1"
 #define TAB_STOP 4
 namespace fs = std::filesystem;
 
@@ -22,7 +21,7 @@ void die(const char *s) {
 FileEditor::FileEditor(int argc, std::string argv) {
     E.statusmsg[0] = '\0';
     formatPath(argc, argv);
-    if (doesPathExist()) {
+    if (pathExist()) {
         this->createFileList();
     } else {
         throw std::invalid_argument("Path could not be found");
@@ -80,7 +79,7 @@ void FileEditor::bufferAppend(const char *s, int len) {
     buffer.len += len;
 }
 
-// Path handling
+// File IO
 /*Fixes the path taken as argument when starting the program.*/
 void FileEditor::formatPath(int argc, std::string argv) {
     char cwd[256];
@@ -151,9 +150,49 @@ bool FileEditor::isDirectory(std::string path) {
 }
 
 /*Checks if the path exists*/
-bool FileEditor::doesPathExist() {
+bool FileEditor::pathExist() {
   struct stat buffer;
   return (stat (complete_path.c_str(), &buffer) == 0);
+}
+
+char* FileEditor::editorRowToString(int* buflen) {
+    int totlen = 0;
+    int j;
+    for (j = 0; j < E.numrows; j++)
+        totlen += E.row[j].size + 1;
+    *buflen = totlen;
+
+    char* buf = reinterpret_cast<char*>(
+        malloc(totlen));
+    char* p = buf;
+    for (j = 0; j < E.numrows; j++) {
+        memcpy(p, E.row[j].chars, E.row[j].size);
+        p += E.row[j].size;
+        *p = '\n';
+        p++;
+    }
+    return buf;
+}
+
+void FileEditor::editorSave() {
+    if (file_list.p[file_number].path == NULL) return;
+
+    int len;
+    char* buf = editorRowToString(&len);
+    int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
+    if (fd != -1) {
+        if (ftruncate(fd, len) != -1) {
+            if(write(fd, buf, len) == len) {
+                close(fd);
+                free(buf);
+                editorSetStatusMessage("%d bytes written to disk", len);
+                return;
+            }
+        }
+        close(fd);
+    }
+    free(buf);
+    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 
 // Terminal handling
@@ -196,17 +235,12 @@ void FileEditor::editorDrawRows() {
         int filerow = y + E.rowoff;
         if (filerow >= E.numrows) {
             if (E.numrows == 0 && y == screenrows / 3) {
-                char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome),
-                    "File editor -- version %s", EDITOR_VERSION);
-                if (welcomelen > screencols) welcomelen = screencols;
-                int padding = (screencols - welcomelen) / 2;
+                int padding = (screencols) / 2;
                 if (padding) {
                     bufferAppend("~", 1);
                     padding--;
                 }
                 while (padding--) bufferAppend(" ", 1);
-                bufferAppend(welcome, welcomelen);
             } else {
                 bufferAppend("~", 1);
             }
@@ -278,7 +312,6 @@ void FileEditor::editorUpdateRow(erow *row, int at) {
             row->render[idx++] = row->chars[j];
         }
     }
-    debug.send(row->render);
     row->render[idx] = '\0';
     row->rsize = idx;
 }
@@ -446,7 +479,7 @@ void FileEditor::resetRows() {
     c.y = 0;
 }
 
-/*Frees all the rows generated from file*/
+/*Frees all the buffered rows */
 void FileEditor::editorFlushRows() {
     int x = 0;
     while (x < E.numrows) {
@@ -510,12 +543,18 @@ int FileEditor::editorReadKey() {
 bool FileEditor::editorProcessKeypress() {
     int read_key = editorReadKey();
     switch (read_key) {
+        case '\r':
+            // Expand later
+            break;
         case CTRL_KEY('q'):
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             return false;
             break;
-        // Experimental, needs to flush saved rows.
+        case CTRL_KEY('s'):
+            editorSave();
+            break;
+        // Experimental, needs to skip executables.
         case CTRL_KEY('w'):
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
@@ -533,6 +572,11 @@ bool FileEditor::editorProcessKeypress() {
                 if (c.y < E.numrows)
                     c.x = E.row[c.y].size;
             }
+            break;
+        case BACKSPACE:
+        case CTRL_KEY('h'):
+        case DEL_KEY:
+            // Expanded later
             break;
         case PAGE_UP:
         case PAGE_DOWN:
@@ -555,6 +599,9 @@ bool FileEditor::editorProcessKeypress() {
         case ARROW_LEFT:
         case ARROW_RIGHT:
             editorMoveCursor(read_key);
+            break;
+        case CTRL_KEY('l'):
+        case '\x1b':
             break;
         default:
             editorInsertChar(read_key);
