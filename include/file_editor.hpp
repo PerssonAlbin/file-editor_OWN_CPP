@@ -17,6 +17,8 @@
 #include <vector>
 #include <filesystem>
 
+#include "include/send_debug.hpp"
+
 #ifdef WINDOWS
     #include <direct.h>
     #include <windows.h>
