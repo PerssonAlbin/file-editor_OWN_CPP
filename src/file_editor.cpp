@@ -182,7 +182,7 @@ void FileEditor::editorSave() {
     int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
     if (fd != -1) {
         if (ftruncate(fd, len) != -1) {
-            if(write(fd, buf, len) == len) {
+            if (write(fd, buf, len) == len) {
                 close(fd);
                 free(buf);
                 editorSetStatusMessage("%d bytes written to disk", len);
