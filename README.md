@@ -1,11 +1,13 @@
 # file-editor_OWN_CPP
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Linux build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linux_build.yml)
+[![CMake build](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/cmake.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/cmake.yml)
 [![Lint Code](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml)
 
 ## Table of contents
 * [General info](#general-info)
+* [Prerequisites](#Prerequisites)
 * [Commands](#Commands)
+* [License](#License)
 
 ## General info
 Simple command-line editor. Takes a directory as an argument and opens the files in that folder. Writing to files will be added in a later version, for now only reads files.
