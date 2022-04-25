@@ -4,8 +4,10 @@
 [![Lint Code](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml)
 
 ## Table of contents
+
 * [General info](#general-info)
 * [Prerequisites](#Prerequisites)
+* [Build](#build)
 * [Commands](#Commands)
 * [License](#License)
 
