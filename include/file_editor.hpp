@@ -32,7 +32,7 @@ namespace fs = std::filesystem;
 
 class FileEditor {
  private:
-    //Append buffer
+    // Append buffer
     struct abuf {
         char *b = reinterpret_cast<char*>(malloc(0));
         int len = 0;
@@ -98,7 +98,7 @@ class FileEditor {
     /* Init functions */
     void die(const char *s);
     void clearFileList();
-    
+
     /* Buffer Functions */
     void bufferAppend(const char *s, int len);
     char* editorRowToString(int* buflen);
@@ -136,9 +136,9 @@ class FileEditor {
 
  public:
     // Init
-    FileEditor(std::string argv);
+    explicit FileEditor(std::string argv);
 
-    //Destructor
+    // Destructor
     ~FileEditor();
 
     // Main function
