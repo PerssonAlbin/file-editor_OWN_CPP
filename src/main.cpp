@@ -30,7 +30,6 @@ int main(int argc, char* argv[]) {
     } else {
         dir_path = formatPath(argc, "");
     }
-    
     try {
         FileEditor editor(dir_path);
         editor.runtime();

@@ -5,4 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(EXECUTABLE_OUTPUT_PATH bin/)
 
 include_directories(.)
-add_executable(file-editor.out src/main.cpp src/file_editor.cpp include/file_editor.hpp)
+add_executable(file-editor.out
+    src/main.cpp
+    src/file_editor/init.cpp
+    src/file_editor/buffer_handling.cpp
+    src/file_editor/editor_handling.cpp
+    src/file_editor/file_handling.cpp
+    src/file_editor/terminal_handling.cpp
+    include/file_editor.hpp)
