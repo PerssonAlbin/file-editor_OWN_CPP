@@ -19,7 +19,7 @@ Simple command-line editor. Takes a directory as an argument and opens the files
 Make sure you have installed all of the following prerequisites on your development machine:
 
 * `g++` to compile the code
-* `cmake` as build system
+* `cmake` as build tool
 
 You can install the prerequisites as follows:
 
