@@ -24,19 +24,31 @@
     #include <unistd.h>
 #endif
 
+#define _BSD_SOURCE
+
+#define CTRL_KEY(k) ((k) & 0x1f)
+#define TAB_STOP 4
+namespace fs = std::filesystem;
+
 class FileEditor {
  private:
-    /* Append buffer */
+    //Append buffer
     struct abuf {
         char *b = reinterpret_cast<char*>(malloc(0));
         int len = 0;
     };
     abuf buffer;
-    void bufferAppend(const char *s, int len);
 
-    /* Render handling */
-    void clearFileList();
-    /* Path handling */
+    /* Cursor handling */
+    struct cursor {
+        int x = 0;
+        int y = 0;
+        int rx = 0;  // Position correction for tabs
+    };
+    cursor c;
+
+    struct termios orig_termios;
+
     int file_number = 0;
     std::string complete_path;
     struct paths {
@@ -49,12 +61,6 @@ class FileEditor {
         int size = 0;
     };
     file_path_list file_list;
-    void formatPath(int argc, std::string argv);
-    void createFileList();
-    bool isDirectory(std::string path);
-    bool pathExist();
-    char* editorRowToString(int* buflen);
-    void editorSave();
 
     /* Terminal handling */
     typedef struct erow {
@@ -74,30 +80,6 @@ class FileEditor {
     editorConfig E;
     int screenrows;
     int screencols;
-    void editorUpdateRow(erow *row, int at);
-    void enableRawMode();
-    void disableRawMode();
-    int getWindowSize(int *rows, int *cols);
-    void editorDrawRows();
-    void editorDrawStatusBar();
-    void editorAppendRow(char *s, size_t len);
-    void editorScroll();
-    void editorSetStatusMessage(const char* fmt, ...);
-    void editorDrawMessageBar();
-
-    /* Cursor handling */
-    struct cursor {
-        int x = 0;
-        int y = 0;
-        int rx = 0;  // Position correction for tabs
-    };
-    cursor c;
-    int getCursorPosition(int *rows, int *cols);
-    void editorMoveCursor(int key);
-    int editorRowCxToRx();
-    /* Insert handling */
-    void editorRowInsertChar(int at, int input);
-    void editorInsertChar(int read_key);
 
     /* Input handling */
     enum editorKey {
@@ -112,19 +94,54 @@ class FileEditor {
         PAGE_UP,
         PAGE_DOWN
     };
-    int editorReadKey();
-    bool editorProcessKeypress();
-    void editorRefreshScreen();
-    void editorOpen(char *filename);
+
+    /* Init functions */
+    void die(const char *s);
+    void clearFileList();
+    
+    /* Buffer Functions */
+    void bufferAppend(const char *s, int len);
+    char* editorRowToString(int* buflen);
+    void editorUpdateRow(erow *row, int at);
     void resetRows();
     void editorFlushRows();
+    void editorAppendRow(char *s, size_t len);
+    void editorRowInsertChar(int at, int input);
+    void editorInsertChar(int read_key);
+
+    /* File functions */
+    void createFileList();
+    bool isDirectory(std::string path);
+    bool pathExist();
+    void editorSave();
+    void editorOpen(char *filename);
+
+    /* Terminal functions */
+    void enableRawMode();
+    void disableRawMode();
+    int getWindowSize(int *rows, int *cols);
+    void editorSetStatusMessage(const char* fmt, ...);
+    int editorReadKey();
+    bool editorProcessKeypress();
+    int getCursorPosition(int *rows, int *cols);
+
+    /* Editor functions */
+    void editorRefreshScreen();
+    void editorDrawMessageBar();
+    void editorDrawRows();
+    void editorDrawStatusBar();
+    void editorMoveCursor(int key);
+    int editorRowCxToRx();
+    void editorScroll();
 
  public:
-    /* Init */
+    // Init
     FileEditor(std::string argv);
+
+    //Destructor
     ~FileEditor();
 
-    /* Main function */
+    // Main function
     void runtime();
 };
 
