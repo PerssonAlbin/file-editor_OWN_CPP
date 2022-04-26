@@ -47,7 +47,7 @@ void FileEditor::runtime() {
     // Compensate for having a status bar
     screenrows -= 2;
     editorOpen(file_list.p[file_number].path);
-    editorSetStatusMessage("HELP: Ctrl-Q = quit");
+    editorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
     bool loop = true;
     while (loop) {
         editorRefreshScreen();

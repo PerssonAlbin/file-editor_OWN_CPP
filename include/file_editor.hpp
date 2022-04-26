@@ -28,6 +28,7 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 #define TAB_STOP 4
+#define QUIT_TIMES 2
 namespace fs = std::filesystem;
 
 class FileEditor {
@@ -76,6 +77,7 @@ class FileEditor {
         int coloff = 0;
         char statusmsg[80];
         time_t statusmsg_time = 0;
+        int dirty = 0;
     };
     editorConfig E;
     int screenrows;

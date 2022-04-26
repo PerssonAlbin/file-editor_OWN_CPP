@@ -75,6 +75,7 @@ void FileEditor::editorAppendRow(char *s, size_t len) {
     E.row[at].render = NULL;
     editorUpdateRow(&E.row[at], at);
     E.numrows++;
+    E.dirty++;
 }
 
 void FileEditor::editorRowInsertChar(int at, int input) {
@@ -86,6 +87,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     E.row[c.y].size++;
     E.row[c.y].chars[at] = input;
     editorUpdateRow(&E.row[c.y], c.y);
+    E.dirty++;
 }
 
 void FileEditor::editorInsertChar(int read_key) {

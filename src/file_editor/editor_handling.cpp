@@ -35,9 +35,10 @@ void FileEditor::editorDrawStatusBar() {
     char status[80];
     char rstatus[80];
 
-    int len = snprintf(status, sizeof(status), "%.20s",
+    int len = snprintf(status, sizeof(status), "%.20s %s",
         file_list.p[file_number].filename ?
-        file_list.p[file_number].filename : "[No Name]");
+        file_list.p[file_number].filename : "[No Name]",
+        E.dirty ? "(modified)" : "");
     int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
         c.y +1, E.numrows);
     if (len > screencols) len = screencols;
