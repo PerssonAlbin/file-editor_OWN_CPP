@@ -82,7 +82,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     E.row[c.y].chars = reinterpret_cast<char*>(
         realloc(E.row[c.y].chars, E.row[c.y].size + 2));
     memmove(&E.row[c.y].chars[at + 1],
-        &E.row[c.y].chars[at], E.row[c.y].size - (at + 1));
+        &E.row[c.y].chars[at], E.row[c.y].size - at);
     E.row[c.y].size++;
     E.row[c.y].chars[at] = input;
     editorUpdateRow(&E.row[c.y], c.y);
