@@ -4,8 +4,10 @@
 [![Lint Code](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml/badge.svg)](https://github.com/DenmarkPolice/file-editor_OWN_CPP/actions/workflows/linter.yml)
 
 ## Table of contents
+
 * [General info](#general-info)
 * [Prerequisites](#Prerequisites)
+* [Build](#build)
 * [Commands](#Commands)
 * [License](#License)
 
@@ -13,8 +15,30 @@
 Simple command-line editor. Takes a directory as an argument and opens the files in that folder. Writing to files will be added in a later version, for now only reads files.
 
 ## Prerequisites
+
 Make sure you have installed all of the following prerequisites on your development machine:
-* g++ - In order to compile the file editor
+
+* `g++` to compile the code
+* `cmake` as build tool
+
+You can install the prerequisites as follows:
+
+On Ubuntu/Debian: `sudo apt install cmake g++ make`
+
+On Fedora/CentOS: `sudo dnf install cmake gcc-c++ make`
+
+On macOS: `brew install cmake`
+
+## Build
+
+To build the application run:
+
+```shell
+cmake .
+make
+```
+
+This will create an executable binary in the `bin/` folder.
 
 ## Commands
 
