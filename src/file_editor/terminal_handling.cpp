@@ -151,7 +151,8 @@ bool FileEditor::editorProcessKeypress() {
         case BACKSPACE:
         case CTRL_KEY('h'):
         case DEL_KEY:
-            // Expanded later
+            if (read_key == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
+            editorDelChar();
             break;
         case PAGE_UP:
         case PAGE_DOWN:

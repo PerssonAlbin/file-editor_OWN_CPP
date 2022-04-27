@@ -12,7 +12,7 @@ build/*
 # Project folders
 **/.idea
 **/CMakeFiles
-**/.vscode
+.vscode/*
 
 # Exceptions
 !.vscode/launch.json

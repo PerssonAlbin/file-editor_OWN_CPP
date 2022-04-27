@@ -110,6 +110,8 @@ class FileEditor {
     void editorAppendRow(char *s, size_t len);
     void editorRowInsertChar(int at, int input);
     void editorInsertChar(int read_key);
+    void editorRowDelChar(erow *row, int at_x, int at_y);
+    void editorDelChar();
 
     /* File functions */
     void createFileList();
