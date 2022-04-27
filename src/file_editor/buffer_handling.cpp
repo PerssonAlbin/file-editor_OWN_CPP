@@ -75,6 +75,7 @@ void FileEditor::editorAppendRow(char *s, size_t len) {
     E.row[at].render = NULL;
     editorUpdateRow(&E.row[at], at);
     E.numrows++;
+    E.dirty++;
 }
 
 void FileEditor::editorRowInsertChar(int at, int input) {
@@ -86,6 +87,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     E.row[c.y].size++;
     E.row[c.y].chars[at] = input;
     editorUpdateRow(&E.row[c.y], c.y);
+    E.dirty++;
 }
 
 void FileEditor::editorInsertChar(int read_key) {
@@ -117,4 +119,23 @@ void FileEditor::editorFlushRows() {
     }
     free(E.row);
     E.row = NULL;
+}
+
+void FileEditor::editorRowDelChar(erow *row, int at_x, int at_y) {
+    if (at_x < 0 || at_x >= row->size) return;
+    memmove(&row->chars[at_x],
+        &row->chars[at_x + 1],
+        row->size - at_x);
+    row->size--;
+    editorUpdateRow(row, at_y);
+    E.dirty++;
+}
+
+void FileEditor::editorDelChar() {
+    if (c.y == E.numrows) return;
+    erow *row = &E.row[c.y];
+    if (c.x > 0) {
+        editorRowDelChar(row, c.x - 1, c.y);
+        c.x--;
+    }
 }

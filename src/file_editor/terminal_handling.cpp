@@ -110,12 +110,19 @@ int FileEditor::editorReadKey() {
 
 /*Processes the available inputs.*/
 bool FileEditor::editorProcessKeypress() {
+    static int quit_times = QUIT_TIMES;
     int read_key = editorReadKey();
     switch (read_key) {
         case '\r':
             // Expand later
             break;
         case CTRL_KEY('q'):
+            if (E.dirty && quit_times > 0) {
+                editorSetStatusMessage(
+                    "File has unsaved changes. Press Ctrl-Q again to quit");
+                quit_times--;
+                return true;
+            }
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             return false;
@@ -145,7 +152,8 @@ bool FileEditor::editorProcessKeypress() {
         case BACKSPACE:
         case CTRL_KEY('h'):
         case DEL_KEY:
-            // Expanded later
+            if (read_key == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
+            editorDelChar();
             break;
         case PAGE_UP:
         case PAGE_DOWN:
@@ -176,6 +184,6 @@ bool FileEditor::editorProcessKeypress() {
             editorInsertChar(read_key);
             break;
     }
-
+    quit_times = QUIT_TIMES;
     return true;
 }
