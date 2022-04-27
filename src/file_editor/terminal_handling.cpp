@@ -118,7 +118,8 @@ bool FileEditor::editorProcessKeypress() {
             break;
         case CTRL_KEY('q'):
             if (E.dirty && quit_times > 0) {
-                editorSetStatusMessage("File has unsaved changes. Press Ctrl-Q again to quit");
+                editorSetStatusMessage(
+                    "File has unsaved changes. Press Ctrl-Q again to quit");
                 quit_times--;
                 return true;
             }
