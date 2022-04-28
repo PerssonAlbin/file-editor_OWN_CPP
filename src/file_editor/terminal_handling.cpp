@@ -107,14 +107,13 @@ int FileEditor::editorReadKey() {
     }
 }
 
-
 /*Processes the available inputs.*/
 bool FileEditor::editorProcessKeypress() {
     static int quit_times = QUIT_TIMES;
     int read_key = editorReadKey();
     switch (read_key) {
         case '\r':
-            // Expand later
+            editorInsertNewline();
             break;
         case CTRL_KEY('q'):
             if (E.dirty && quit_times > 0) {
