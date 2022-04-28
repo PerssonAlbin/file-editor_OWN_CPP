@@ -12,7 +12,7 @@
 * [License](#License)
 
 ## General info
-Simple command-line editor. Takes a directory as an argument and opens the files in that folder.
+Simple command-line editor. Takes a directory as an argument and opens the files in that folder. Now have all the basic functionalities of a file editor.
 
 ## Prerequisites
 
