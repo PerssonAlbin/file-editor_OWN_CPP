@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        std::cout << "Usage: " << argv[0] << " [path to dir]" << std::endl; 
+        std::cout << "Usage: " << argv[0] << " [path to dir]" << std::endl;
         return -1;
     }
 
@@ -16,7 +16,8 @@ int main(int argc, char* argv[]) {
         std::cerr << e.what() << std::endl;
         return -1;
     } catch(std::filesystem::filesystem_error& e) {
-        std::cerr << "Unable to resolve the given directory path.\n"<< e.what() << std::endl;
+        std::cerr << "Unable to resolve the given directory path.\n"
+            << e.what() << std::endl;
         return -1;
     }
     return 0;
