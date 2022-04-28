@@ -31,10 +31,17 @@ On macOS: `brew install cmake`
 
 ## Build
 
-To build the application run:
+To create a debug build run:
 
 ```shell
 cmake .
+make
+```
+
+To create a release build run:
+
+```shell
+cmake -DCMAKE_BUILD_TYPE=Release .
 make
 ```
 
