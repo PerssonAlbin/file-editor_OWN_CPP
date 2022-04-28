@@ -37,15 +37,14 @@ char* FileEditor::editorRowToString(int* buflen) {
 }
 
 /*Updates the row char string to identify and modify the display of tabs.*/
-void FileEditor::editorUpdateRow(erow *row, int at) {
+void FileEditor::editorUpdateRow(erow *row) {
     int tabs = 0;
-    // int at = E.numrows;
     int j;
     for (j = 0; j < row->size; j++) {
         if (row->chars[j] == '\t') tabs++;
     }
 
-    free(E.row[at].render);
+    free(row->render);
     row->render = reinterpret_cast<char*>(
         malloc(row->size + tabs*(TAB_STOP - 1) + 1));
     int idx = 0;
@@ -73,7 +72,7 @@ void FileEditor::editorAppendRow(char *s, size_t len) {
 
     E.row[at].rsize = 0;
     E.row[at].render = NULL;
-    editorUpdateRow(&E.row[at], at);
+    editorUpdateRow(&E.row[at]);
     E.numrows++;
     E.dirty++;
 }
@@ -86,7 +85,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
         &E.row[c.y].chars[at], E.row[c.y].size - at);
     E.row[c.y].size++;
     E.row[c.y].chars[at] = input;
-    editorUpdateRow(&E.row[c.y], c.y);
+    editorUpdateRow(&E.row[c.y]);
     E.dirty++;
 }
 
@@ -109,16 +108,30 @@ void FileEditor::resetRows() {
     c.y = 0;
 }
 
+/* Frees one row */
+void FileEditor::editorFreeRow(erow *row) {
+    free(row->chars);
+    free(row->render);
+}
+
 /*Frees all the buffered rows */
 void FileEditor::editorFlushRows() {
     int x = 0;
     while (x < E.numrows) {
-        free(E.row[x].chars);
-        free(E.row[x].render);
+        editorFreeRow(&E.row[x]);
         x += 1;
     }
     free(E.row);
     E.row = NULL;
+}
+
+void FileEditor::editorDelRow(int at) {
+    if (at < 0 || at >= E.numrows) return;
+    editorFreeRow(&E.row[at]);
+    memmove(&E.row[at],
+        &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
+    E.numrows--;
+    E.dirty++;
 }
 
 void FileEditor::editorRowDelChar(erow *row, int at_x, int at_y) {
@@ -127,15 +140,31 @@ void FileEditor::editorRowDelChar(erow *row, int at_x, int at_y) {
         &row->chars[at_x + 1],
         row->size - at_x);
     row->size--;
-    editorUpdateRow(row, at_y);
+    editorUpdateRow(row);
     E.dirty++;
 }
 
 void FileEditor::editorDelChar() {
     if (c.y == E.numrows) return;
+    if (c.x == 0 && c.y == 0) return;
     erow *row = &E.row[c.y];
     if (c.x > 0) {
         editorRowDelChar(row, c.x - 1, c.y);
         c.x--;
+    } else {
+        c.x = E.row[c.y - 1].size;
+        editorRowAppendString(&E.row[c.y - 1], row->chars, row->size);
+        editorDelRow(c.y);
+        c.y--;
     }
+}
+
+void FileEditor::editorRowAppendString(erow *row, char *s, size_t len) {
+    row->chars = reinterpret_cast<char*>(
+        realloc(row->chars, row->size + len + 1));
+    memcpy(&row->chars[row->size], s, len);
+    row->size += len;
+    row->chars[row->size] = '\0';
+    editorUpdateRow(row);
+    E.dirty++;
 }
