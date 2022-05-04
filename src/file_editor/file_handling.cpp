@@ -8,7 +8,7 @@ directories have been added to file_list.*/
 void FileEditor::createFileList() {
     std::string placeholder;
     int len;
-    auto dir_iter = fs::recursive_directory_iterator(this->complete_path); 
+    auto dir_iter = fs::recursive_directory_iterator(this->complete_path);
     for (const auto & entry : dir_iter) {
         placeholder = entry.path();
         len = placeholder.size();
@@ -34,7 +34,7 @@ void FileEditor::createFileList() {
         memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
         file_list.p[file_list.size].path[len] = '\0';
         file_list.p[file_list.size].size = len;
-        file_list.size++; 
+        file_list.size++;
     }
 }
 
