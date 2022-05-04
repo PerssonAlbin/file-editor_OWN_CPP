@@ -120,7 +120,6 @@ class FileEditor {
     /* File functions */
     void createFileList();
     bool isDirectory(std::string path);
-    bool pathExist();
     void editorSave();
     void editorOpen(char *filename);
 
