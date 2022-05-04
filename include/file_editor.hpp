@@ -142,6 +142,10 @@ class FileEditor {
     int editorRowCxToRx();
     void editorScroll();
 
+    /* ANSI Escape Sequence for terminals */
+    inline static const char* TERM_CLEAR_SCREEN = "\x1b[2J";
+    inline static const char* TERM_SEND_CURSOR_HOME = "\x1b[H";
+
  public:
     // Init
     explicit FileEditor(std::string argv);
