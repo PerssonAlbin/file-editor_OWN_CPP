@@ -55,12 +55,6 @@ bool FileEditor::isDirectory(std::string path) {
     return -1;
 }
 
-/*Checks if the path exists*/
-bool FileEditor::pathExist() {
-  struct stat buffer;
-  return (stat (complete_path.c_str(), &buffer) == 0);
-}
-
 void FileEditor::editorSave() {
     if (file_list.p[file_number].path == NULL) return;
 
