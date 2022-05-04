@@ -13,7 +13,7 @@ void FileEditor::createFileList() {
         placeholder = entry.path();
         len = placeholder.size();
         if (fs::is_directory(placeholder)) {
-            // TODO: Implement directory handling
+            // TODO(PerssonAlbin): Implement directory handling
             continue;
         }
 
