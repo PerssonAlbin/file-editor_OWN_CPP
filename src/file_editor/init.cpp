@@ -3,21 +3,17 @@
 
 /*Removes the program from the screen and exits.*/
 void FileEditor::die(const char *s) {
-    write(STDOUT_FILENO, "\x1b[2J", 4);
-    write(STDOUT_FILENO, "\x1b[H", 3);
+    write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
+    write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
 
     perror(s);
 }
 
 /* Init */
-FileEditor::FileEditor(std::string argv) {
+FileEditor::FileEditor(std::string dir_path) {
     E.statusmsg[0] = '\0';
-    complete_path = argv;
-    if (pathExist()) {
-        this->createFileList();
-    } else {
-        throw std::invalid_argument("Path could not be found");
-    }
+    complete_path = dir_path;
+    this->createFileList();
 }
 
 // Destructor functions
