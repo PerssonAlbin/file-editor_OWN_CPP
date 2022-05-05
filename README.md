@@ -53,6 +53,7 @@ This will create an executable binary in the `bin/` folder.
 |--------------|-----------|
 | Exit program | Ctrl-Q    |
 | Switch file  | Ctrl-W    |
+| Save file    | Ctrl-S    |
 
 ## License
 
