@@ -23,7 +23,7 @@ void FileEditor::editorDrawRows() {
             if (len > screencols) len = screencols;
             bufferAppend(&E.row[filerow].render[E.coloff], len);
         }
-        bufferAppend("\x1b[K", 3);
+        bufferAppend(TERM_CLEAR_LINES, 3);
         bufferAppend("\r\n", 2);
     }
 }
@@ -31,7 +31,7 @@ void FileEditor::editorDrawRows() {
 /*Appends the status bar with white background showing filename
 and current_line/total_lines.*/
 void FileEditor::editorDrawStatusBar() {
-    bufferAppend("\x1b[7m", 4);
+    bufferAppend(TERM_INVERSE_COLOR, 4);
     char status[80];
     char rstatus[80];
 
@@ -52,13 +52,13 @@ void FileEditor::editorDrawStatusBar() {
             len++;
         }
     }
-    bufferAppend("\x1b[m", 3);
+    bufferAppend(TERM_RESET_STYLE, 3);
     bufferAppend("\r\n", 2);
 }
 
 /*Simply render message bar for displaying info.*/
 void FileEditor::editorDrawMessageBar() {
-    bufferAppend("\x1b[K", 3);
+    bufferAppend(TERM_CLEAR_LINES, 3);
     int msglen = strlen(E.statusmsg);
     if (msglen > screencols) msglen = screencols;
     if (msglen && time(NULL) - E.statusmsg_time < 5)
@@ -126,7 +126,7 @@ int FileEditor::editorRowCxToRx() {
     int rx = 0;
     int j;
     for (j = 0; j < c.x; j++) {
-        if (E.row[c.y].chars[j] == '\t')
+        if (E.row[c.y].chars[j] == TAB)
         rx += (TAB_STOP - 1) - (rx % TAB_STOP);
         rx++;
     }
@@ -138,8 +138,8 @@ the other info to be displayed.*/
 void FileEditor::editorRefreshScreen() {
     editorScroll();
 
-    bufferAppend("\x1b[?25l", 6);
-    bufferAppend("\x1b[H", 3);
+    bufferAppend(TERM_HIDE_CURSOR, 6);
+    bufferAppend(TERM_SEND_CURSOR_HOME, 3);
 
     editorDrawRows();
     editorDrawStatusBar();
@@ -151,7 +151,7 @@ void FileEditor::editorRefreshScreen() {
         (c.rx - E.coloff) + 1);
     bufferAppend(buf, strlen(buf));
 
-    bufferAppend("\x1b[?25h", 6);
+    bufferAppend(TERM_SHOW_CURSOR, 6);
 
     write(STDOUT_FILENO, buffer.b, buffer.len);
     buffer.len = 0;

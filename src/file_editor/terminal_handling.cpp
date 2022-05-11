@@ -22,7 +22,10 @@ void FileEditor::enableRawMode() {
 int FileEditor::getWindowSize(int *rows, int *cols) {
     struct winsize ws;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-        if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
+        // Moves cursor
+        if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) {
+            return -1;
+        }
         return getCursorPosition(rows, cols);
     } else {
         *cols = ws.ws_col;
@@ -46,15 +49,25 @@ still visible to determine window size.*/
 int FileEditor::getCursorPosition(int *rows, int *cols) {
     char buf[32];
     unsigned int i = 0;
-    if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
+    if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) {
+        return -1;
+    }
     while (i < sizeof(buf) - 1) {
-        if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
-        if (buf[i] == 'R') break;
+        if (read(STDIN_FILENO, &buf[i], 1) != 1) {
+            break;
+        }
+        if (buf[i] == 'R') {
+            break;
+        }
         i++;
     }
-    buf[i] = '\0';
-    if (buf[0] != '\x1b' || buf[1] != '[') return -1;
-    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+    buf[i] = END_OF_ROW;
+    if (buf[0] != '\x1b' || buf[1] != '[') {
+        return -1;
+    }
+    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) {
+        return -1;
+    }
     return 0;
 }
 
@@ -64,16 +77,22 @@ int FileEditor::editorReadKey() {
     int nread;
     char c;
     while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
-        if (nread == -1 && errno != EAGAIN) die("read");
+        if (nread == -1 && errno != EAGAIN) {
+            die("read");
+        }
     }
     // Special case for arrow keys
-    if (c == '\x1b') {
+    if (c == TERM_ESC) {
         char seq[3];
-        if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
-        if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+        if (read(STDIN_FILENO, &seq[0], 1) != 1) {
+            return TERM_ESC;
+        }
+        if (read(STDIN_FILENO, &seq[1], 1) != 1) {
+            return TERM_ESC;
+        }
         if (seq[0] == '[') {
             if (seq[1] >= '0' && seq[1] <= '9') {
-                if (read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+                if (read(STDIN_FILENO, &seq[2], 1) != 1) return TERM_ESC;
                 if (seq[2] == '~') {
                     switch (seq[1]) {
                         case '1': return HOME_KEY;
@@ -101,7 +120,7 @@ int FileEditor::editorReadKey() {
                 case 'F': return END_KEY;
             }
         }
-        return '\x1b';
+        return TERM_ESC;
     } else {
         return c;
     }
@@ -131,8 +150,8 @@ bool FileEditor::editorProcessKeypress() {
             break;
         // Experimental, needs to skip executables.
         case CTRL_KEY('w'):
-            write(STDOUT_FILENO, "\x1b[2J", 4);
-            write(STDOUT_FILENO, "\x1b[H", 3);
+            write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
+            write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
             if (file_number >= 0 && file_number < file_list.size) {
                 file_number++;
                 resetRows();
@@ -177,7 +196,7 @@ bool FileEditor::editorProcessKeypress() {
             editorMoveCursor(read_key);
             break;
         case CTRL_KEY('l'):
-        case '\x1b':
+        case TERM_ESC:
             break;
         default:
             editorInsertChar(read_key);
