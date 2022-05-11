@@ -7,7 +7,7 @@ set(EXECUTABLE_OUTPUT_PATH bin/)
 include_directories(.)
 add_executable(file-editor.out
     src/main.cpp
-    src/file_editor/init.cpp
+    src/file_editor/file_editor.cpp
     src/file_editor/buffer_handling.cpp
     src/file_editor/editor_handling.cpp
     src/file_editor/file_handling.cpp
