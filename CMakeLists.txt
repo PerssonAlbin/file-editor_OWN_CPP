@@ -3,6 +3,7 @@ project(file-editor.out)
 
 set(CMAKE_CXX_STANDARD 17)
 set(EXECUTABLE_OUTPUT_PATH bin/)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(.)
 add_executable(file-editor.out
