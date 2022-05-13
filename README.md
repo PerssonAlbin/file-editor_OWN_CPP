@@ -47,6 +47,8 @@ make
 
 This will create an executable binary in the `bin/` folder.
 
+If you are using Visual Studio Code then we recommend the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) to build, debug, and run the application.
+
 ## Commands
 
 | Commands     ||

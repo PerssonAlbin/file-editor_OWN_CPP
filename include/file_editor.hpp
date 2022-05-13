@@ -143,8 +143,16 @@ class FileEditor {
     void editorScroll();
 
     /* ANSI Escape Sequence for terminals */
+    inline static const char END_OF_ROW = '\0';
+    inline static const char TERM_ESC = '\x1b';
+    inline static const char TAB = '\t';
+    inline static const char* TERM_CLEAR_LINES = "\x1b[K";
+    inline static const char* TERM_RESET_STYLE = "\x1b[m";
+    inline static const char* TERM_INVERSE_COLOR = "\x1b[7m";
     inline static const char* TERM_CLEAR_SCREEN = "\x1b[2J";
     inline static const char* TERM_SEND_CURSOR_HOME = "\x1b[H";
+    inline static const char* TERM_SHOW_CURSOR = "\x1b[?25h";
+    inline static const char* TERM_HIDE_CURSOR = "\x1b[?25l";
 
  public:
     // Init
