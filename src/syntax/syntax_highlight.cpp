@@ -1,5 +1,10 @@
 #include "include/syntax_highlight.hpp"
 
+const char* SYNTAX_YELLOW = "\x1b[33m";
+const char* SYNTAX_BLUE = "\x1b[36m";
+const char* SYNTAX_GREEN = "\x1b[92m";
+const char* SYNTAX_BRIGHT_YELLOW = "\x1b[93m";
+const char* SYNTAX_RESET = "\x1b[0m";
 
 int SyntaxHighlight::detect_filetype(char* file_ext) {
     if (strcmp(file_ext, ".cpp") ||

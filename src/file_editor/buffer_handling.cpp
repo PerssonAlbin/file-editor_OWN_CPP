@@ -47,15 +47,19 @@ void FileEditor::editorUpdateRow(erow *row) {
     }
 
     free(row->render);
+    SyntaxHighlight syntax;
+    std::string syntaxed_row = syntax.hightlight_line(
+        row->chars,file_list.p[file_number].filename);
+    
     row->render = reinterpret_cast<char*>(
-        malloc(row->size + tabs*(TAB_STOP - 1) + 1));
+        malloc(syntaxed_row.size() + tabs*(TAB_STOP - 1) + 1)); // row->size
     int idx = 0;
-    for (j = 0; j < row->size; j++) {
-        if (row->chars[j] == TAB) {
+    for (j = 0; j < syntaxed_row.size(); j++) { // row->size
+        if (syntaxed_row[j] == TAB) { // row->chars[j]
             row->render[idx++] = ' ';
             while (idx % TAB_STOP != 0) row->render[idx++] = ' ';
         } else {
-            row->render[idx++] = row->chars[j];
+            row->render[idx++] = syntaxed_row[j];
         }
     }
     row->render[idx] = END_OF_ROW;
