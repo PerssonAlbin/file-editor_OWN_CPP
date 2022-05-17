@@ -47,8 +47,8 @@ std::string SyntaxHighlight::cpp_style(char* line) {
     auto searchResults = std::smatch{};
     std::string search_text = std::string(line);
 
-    // Comments
-    if (std::regex_search(search_text, searchResults, regex_comment)) {
+    auto isComment = std::regex_search(search_text, searchResults, regex_comment);
+    if (isComment)) {
         std::vector<std::pair<int,int>> index_length;
         for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_comment);
         it != std::sregex_iterator();
@@ -59,8 +59,8 @@ std::string SyntaxHighlight::cpp_style(char* line) {
         search_text.insert(index_length[0].first, SYNTAX_GREEN);
     }
 
-    // Strings
-    if (std::regex_search(search_text, searchResults, regex_string)) {
+    auto isString = std::regex_search(search_text, searchResults, regex_string);
+    if (isString) {
         std::vector<std::pair<int,int>> index_length;
         for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_string);
         it != std::sregex_iterator();
@@ -70,8 +70,9 @@ std::string SyntaxHighlight::cpp_style(char* line) {
         search_text.insert(index_length[0].first+index_length[0].second, SYNTAX_RESET);
         search_text.insert(index_length[0].first, SYNTAX_BRIGHT_YELLOW);
     }
-    // Types
-    if (std::regex_search(search_text, searchResults, regex_type)) {
+
+    auto isType = std::regex_search(search_text, searchResults, regex_type);
+    if (isType) {
         std::vector<std::pair<int,int>> index_length;
         for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_type);
         it != std::sregex_iterator();
@@ -82,8 +83,8 @@ std::string SyntaxHighlight::cpp_style(char* line) {
         search_text.insert(index_length[0].first, SYNTAX_BLUE);
     }
 
-    // Statements
-    if (std::regex_search(search_text, searchResults, regex_statement)) {
+    auto isStatement = std::regex_search(search_text, searchResults, regex_statement);
+    if (isStatement) {
         std::vector<std::pair<int,int>> index_length;
         for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_statement);
         it != std::sregex_iterator();
@@ -93,5 +94,6 @@ std::string SyntaxHighlight::cpp_style(char* line) {
         search_text.insert(index_length[0].first+index_length[0].second, SYNTAX_RESET);
         search_text.insert(index_length[0].first, SYNTAX_YELLOW);
     }
+
     return (search_text);
 }
