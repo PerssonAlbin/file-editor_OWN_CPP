@@ -6,7 +6,7 @@ const char* SYNTAX_GREEN = "\x1b[92m";
 const char* SYNTAX_BRIGHT_YELLOW = "\x1b[93m";
 const char* SYNTAX_RESET = "\x1b[0m";
 
-int SyntaxHighlight::detect_filetype(char* file_ext) {
+int SyntaxHighlight::detectFiletype(char* file_ext) {
     if (strcmp(file_ext, ".cpp") ||
         strcmp(file_ext, ".c") ||
         strcmp(file_ext, ".hpp") ||
@@ -16,13 +16,13 @@ int SyntaxHighlight::detect_filetype(char* file_ext) {
     return 0;
 }
 
-std::string SyntaxHighlight::hightlight_line(char* line, char* file_ext) {
-    int c = detect_filetype(file_ext);
+std::string SyntaxHighlight::hightlightLine(char* line, char* file_ext) {
+    int c = detectFiletype(file_ext);
 
     switch(c) {
         // C/C++ code
         case 1:
-            return cpp_style(line);
+            return cppStyle(line);
             break;
         // No case found
         default:
@@ -32,7 +32,7 @@ std::string SyntaxHighlight::hightlight_line(char* line, char* file_ext) {
     }
 }
 
-std::string SyntaxHighlight::cpp_style(char* line) {
+std::string SyntaxHighlight::cppStyle(char* line) {
     int last_found = 0;
     int current = 0;
     int line_size = 0;
@@ -48,7 +48,7 @@ std::string SyntaxHighlight::cpp_style(char* line) {
     std::string search_text = std::string(line);
 
     auto isComment = std::regex_search(search_text, searchResults, regex_comment);
-    if (isComment)) {
+    if (isComment) {
         std::vector<std::pair<int,int>> index_length;
         for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_comment);
         it != std::sregex_iterator();
