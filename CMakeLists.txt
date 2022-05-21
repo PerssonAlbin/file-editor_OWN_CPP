@@ -13,4 +13,6 @@ add_executable(file-editor.out
     src/file_editor/editor_handling.cpp
     src/file_editor/file_handling.cpp
     src/file_editor/terminal_handling.cpp
+    src/file_type/file_type.cpp
+    include/file_type.hpp
     include/file_editor.hpp)
