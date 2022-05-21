@@ -1,3 +1,5 @@
+// Copyright 2022 Andreas Bauer
+
 #include "include/file_type.hpp"
 
 namespace filetype {
@@ -12,7 +14,7 @@ std::string fileTypeToStr(FileType type) {
 }
 
 FileType fileTypeFromStr(const std::string file_ext) {
-    std::string lower_ext (file_ext);
+    std::string lower_ext(file_ext);
     std::for_each(lower_ext.begin(), lower_ext.end(), [](char & c){
       c = ::tolower(c);
     });
@@ -39,5 +41,4 @@ FileType fileTypeFromStr(const std::string file_ext) {
     return FileType::txt;
 }
 
-}
-
+}  // namespace filetype

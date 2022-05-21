@@ -4,6 +4,7 @@
 #define INCLUDE_FILE_TYPE_HPP_
 
 #include <iostream>
+#include <string>
 
 namespace filetype {
     enum class FileType { md, cpp, txt };
@@ -12,4 +13,4 @@ namespace filetype {
     std::string fileTypeToStr(FileType type);
 }
 
-#endif
+#endif  // INCLUDE_FILE_TYPE_HPP_
