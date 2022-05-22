@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 namespace filetype {
     enum class FileType { md, cpp, txt };
