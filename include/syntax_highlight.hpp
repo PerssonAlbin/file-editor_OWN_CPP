@@ -9,10 +9,11 @@
 
 class SyntaxHighlight {
  private:
-   std::string cppStyle(char* line);
-   int detectFiletype(char* filename);
+    std::string cppStyle(char* line);
+    int detectFiletype(char* filename);
  public:
-   std::string hightlightLine(char* line, char* filename);
+    unsigned int added_length = 0;
+    std::string hightlightLine(char* line, char* filename);
 };
 
 
