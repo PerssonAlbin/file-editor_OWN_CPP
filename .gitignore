@@ -8,6 +8,8 @@
 *.cmake
 Makefile
 build/*
+.cache/
+compile_commands.json
 
 # Project folders
 **/.idea
