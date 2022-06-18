@@ -29,7 +29,8 @@ std::string SyntaxHighlight::hightlightLine(char* line, char* file_ext) {
             break;
         // No case found
         default:
-            // Should set status message of the editor to no highlighting found
+            // Should set status message of the editor to 
+            // no highlighting found.
             return line;
             break;
     }
@@ -47,9 +48,11 @@ std::string SyntaxHighlight::cppStyle(char* line) {
     std::string search_text = std::string(line);
     int comment_index = -1;
 
-    auto is_comment = std::regex_search(search_text, search_results, regex_comment);
+    auto is_comment = std::regex_search(
+        search_text, search_results, regex_comment);
     if (is_comment) {
-        for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_comment);
+        for (auto it = std::sregex_iterator(
+            search_text.begin(), search_text.end(), regex_comment);
         it != std::sregex_iterator();
         ++it) {
             added_length += (SIZE_OF_RESET_ESC + SIZE_OF_COLOR_ESC);
@@ -60,20 +63,24 @@ std::string SyntaxHighlight::cppStyle(char* line) {
         }
     }
 
-    auto is_string = std::regex_search(search_text, search_results, regex_string);
+    auto is_string = std::regex_search(
+        search_text, search_results, regex_string);
     if (is_string) {
         std::vector<std::pair<int, int>> index_length;
-        for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_string);
+        for (auto it = std::sregex_iterator(search_text.begin(),
+            search_text.end(), regex_string);
         it != std::sregex_iterator();
         ++it) {
             if (comment_index != -1 && comment_index < it->position()) {
                 break;
             }
             if (it->length() > 0) {
-                index_length.push_back(std::make_pair<int, int>(it->position(), it->length()));
+                index_length.push_back(
+                    std::make_pair<int, int>(it->position(), it->length()));
             }
         }
-        for (int found_index = index_length.size(); found_index > 0; found_index--) {
+        for (int found_index = index_length.size();
+                found_index > 0; found_index--) {
             std::pair<int, int> current_index = index_length[found_index-1];
             search_text.insert(
                 current_index.first+current_index.second, S_RESET);
@@ -85,17 +92,20 @@ std::string SyntaxHighlight::cppStyle(char* line) {
     auto is_type = std::regex_search(search_text, search_results, regex_type);
     if (is_type) {
         std::vector<std::pair<int,int>> index_length;
-        for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_type);
+        for (auto it = std::sregex_iterator(
+            search_text.begin(), search_text.end(), regex_type);
         it != std::sregex_iterator();
         ++it) {
             if (comment_index != -1 && comment_index < it->position()) {
                 break;
             }
             if (it->length() > 0) {
-                index_length.push_back(std::make_pair<int, int>(it->position(), it->length()));
+                index_length.push_back(
+                    std::make_pair<int, int>(it->position(), it->length()));
             }
         }
-        for (int found_index = index_length.size(); found_index > 0; found_index--) {
+        for (int found_index = index_length.size();
+            found_index > 0; found_index--) {
             std::pair<int, int> current_index = index_length[found_index-1];
             search_text.insert(
                 current_index.first+current_index.second, S_RESET);
@@ -104,20 +114,24 @@ std::string SyntaxHighlight::cppStyle(char* line) {
         }
     }
 
-    auto is_statement = std::regex_search(search_text, search_results, regex_statement);
+    auto is_statement = std::regex_search(
+        search_text, search_results, regex_statement);
     if (is_statement) {
         std::vector<std::pair<int,int>> index_length;
-        for (auto it = std::sregex_iterator(search_text.begin(), search_text.end(), regex_statement);
+        for (auto it = std::sregex_iterator(
+            search_text.begin(), search_text.end(), regex_statement);
         it != std::sregex_iterator();
         ++it) {
             if (comment_index != -1 && comment_index < it->position()) {
                 break;
             }
             if (it->length() > 0) {
-                index_length.push_back(std::make_pair<int, int>(it->position(), it->length()));
+                index_length.push_back(
+                    std::make_pair<int, int>(it->position(), it->length()));
             }
         }
-        for (int found_index = index_length.size(); found_index > 0; found_index--) {
+        for (int found_index = index_length.size();
+            found_index > 0; found_index--) {
             std::pair<int, int> current_index = index_length[found_index-1];
             search_text.insert(
                 current_index.first+current_index.second, S_RESET);
