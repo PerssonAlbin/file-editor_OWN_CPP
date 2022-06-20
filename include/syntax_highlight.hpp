@@ -6,10 +6,11 @@
 #include <vector>
 #include <iostream>
 #include <regex>
+#include <string>
 
 class SyntaxHighlight {
  private:
-    int comment_index = -1; 
+    int comment_index = -1;
     std::string cppStyle(char* line);
     int detectFiletype(char* filename);
     std::string injectColor(std::string search_text, std::regex regex_check);
