@@ -41,8 +41,8 @@ std::string SyntaxHighlight::cppStyle(char* line) {
     auto const regex_string = std::regex("\".*\"");
     auto const regex_comment = std::regex("(//).*");
     auto const regex_statement = std::regex(
-        "(std::endl|std::cerr|std::ifstream|std::cout|break |if |while \
-        |switch|case|throw|catch|default|do|goto|return|try|for |#include)");
+        R"(std::endl|std::cerr|std::ifstream|std::cout|break |if |while )"
+        R"(|switch|case|throw|catch|default|do|goto|return|try|for |#include)");
     auto const regex_type = std::regex(
         "(|int|std::string|std::vector|long|char|size_t|namespace)");
     auto search_results = std::smatch{};
@@ -77,7 +77,7 @@ std::string SyntaxHighlight::cppStyle(char* line) {
             }
             if (it->length() > 0) {
                 index_length.push_back(
-                    std::make_pair<int, int>(it->position(), it->length()));
+                    std::pair<int, int>(it->position(), it->length()));
             }
         }
         for (int found_index = index_length.size();
@@ -102,7 +102,7 @@ std::string SyntaxHighlight::cppStyle(char* line) {
             }
             if (it->length() > 0) {
                 index_length.push_back(
-                    std::make_pair<int, int>(it->position(), it->length()));
+                    std::pair<int, int>(it->position(), it->length()));
             }
         }
         for (int found_index = index_length.size();
@@ -128,7 +128,7 @@ std::string SyntaxHighlight::cppStyle(char* line) {
             }
             if (it->length() > 0) {
                 index_length.push_back(
-                    std::make_pair<int, int>(it->position(), it->length()));
+                    std::pair<int, int>(it->position(), it->length()));
             }
         }
         for (int found_index = index_length.size();
