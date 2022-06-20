@@ -19,10 +19,10 @@ int SyntaxHighlight::detectFiletype(char* file_ext) {
     return 0;
 }
 
-std::string SyntaxHighlight::injectColor(std::string search_text, std::regex regex_check) {
+std::string SyntaxHighlight::injectColor(std::string text, std::regex regex) {
     std::vector<std::pair<int, int>> index_length;
     for (auto it = std::sregex_iterator(
-        search_text.begin(), search_text.end(), regex_check);
+        text.begin(), text.end(), regex);
         it != std::sregex_iterator();
         ++it) {
         if (comment_index != -1 && comment_index < it->position()) {
@@ -36,12 +36,12 @@ std::string SyntaxHighlight::injectColor(std::string search_text, std::regex reg
     for (int found_index = index_length.size();
         found_index > 0; found_index--) {
         std::pair<int, int> current_index = index_length[found_index-1];
-        search_text.insert(
+        text.insert(
             current_index.first+current_index.second, S_RESET);
-        search_text.insert(current_index.first, S_YELLOW);
+        text.insert(current_index.first, S_YELLOW);
         added_length += (SIZE_OF_RESET_ESC + SIZE_OF_COLOR_ESC);
     }
-    return search_text;
+    return text;
 }
 
 std::string SyntaxHighlight::hightlightLine(char* line, char* file_ext) {
