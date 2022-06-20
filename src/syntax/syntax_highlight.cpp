@@ -29,7 +29,7 @@ std::string SyntaxHighlight::hightlightLine(char* line, char* file_ext) {
             break;
         // No case found
         default:
-            // Should set status message of the editor to 
+            // Should set status message of the editor to
             // no highlighting found.
             return line;
             break;
@@ -41,7 +41,8 @@ std::string SyntaxHighlight::cppStyle(char* line) {
     auto const regex_string = std::regex("\".*\"");
     auto const regex_comment = std::regex("(//).*");
     auto const regex_statement = std::regex(
-        "(std::endl|std::cerr|std::ifstream|std::cout|break |if |while |switch|case|throw|catch|default|do|goto|return|try|for |#include)");
+        "(std::endl|std::cerr|std::ifstream|std::cout|break |if |while \
+        |switch|case|throw|catch|default|do|goto|return|try|for |#include)");
     auto const regex_type = std::regex(
         "(|int|std::string|std::vector|long|char|size_t|namespace)");
     auto search_results = std::smatch{};
