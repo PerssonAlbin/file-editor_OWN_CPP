@@ -39,7 +39,9 @@ FileEditor::~FileEditor() {
 /* Main function */
 void FileEditor::runtime() {
     enableRawMode();
-    if (getWindowSize(&screenrows, &screencols) == -1) die("getWindowSize");
+    if (getWindowSize(&screenrows, &screencols) == -1) {
+        die("getWindowSize");
+    }
     // Compensate for having a status bar
     screenrows -= 2;
     editorOpen(file_list.p[file_number].path);

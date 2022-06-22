@@ -47,15 +47,22 @@ void FileEditor::editorUpdateRow(erow *row) {
     }
 
     free(row->render);
+    SyntaxHighlight syntax;
+    std::string syntaxed_row = syntax.hightlightLine(
+        row->chars, file_list.p[file_number].filename);
+
     row->render = reinterpret_cast<char*>(
-        malloc(row->size + tabs*(TAB_STOP - 1) + 1));
+        malloc(syntaxed_row.size() + tabs*(TAB_STOP - 1) + 1));
     int idx = 0;
-    for (j = 0; j < row->size; j++) {
-        if (row->chars[j] == TAB) {
+    row->rsize = syntax.added_length + row->size;
+    for (j = 0; j < row->rsize; j++) {
+        if (syntaxed_row[j] == TAB) {
             row->render[idx++] = ' ';
-            while (idx % TAB_STOP != 0) row->render[idx++] = ' ';
+            while (idx % TAB_STOP != 0) {
+                row->render[idx++] = ' ';
+            }
         } else {
-            row->render[idx++] = row->chars[j];
+            row->render[idx++] = syntaxed_row[j];
         }
     }
     row->render[idx] = END_OF_ROW;
@@ -92,6 +99,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     }
     E.row[c.y].chars = reinterpret_cast<char*>(
         realloc(E.row[c.y].chars, E.row[c.y].size + 2));
+
     memmove(&E.row[c.y].chars[at + 1],
         &E.row[c.y].chars[at], E.row[c.y].size - at);
     E.row[c.y].size++;
