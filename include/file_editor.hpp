@@ -2,8 +2,6 @@
 #ifndef INCLUDE_FILE_EDITOR_HPP_
 #define INCLUDE_FILE_EDITOR_HPP_
 
-#include "include/syntax_highlight.hpp"
-
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <string.h>
@@ -23,6 +21,8 @@
 #else
     #include <unistd.h>
 #endif
+
+#include "include/syntax_highlight.hpp"
 
 #define _BSD_SOURCE
 
