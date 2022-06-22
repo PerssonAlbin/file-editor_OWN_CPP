@@ -5,7 +5,7 @@
 #include <string.h>
 #include <vector>
 #include <iostream>
-#include <regex>
+#include <regex>  // NOLINT
 #include <string>
 
 class SyntaxHighlight {
