@@ -17,28 +17,27 @@ void FileEditor::createFileList() {
             continue;
         }
 
-        // Creates a new path entry
-        file_list.p = reinterpret_cast<paths*>(
-            realloc(file_list.p, sizeof(paths) * (file_list.size + 1)));
+        paths path;
 
         std::string filename = this->trimFilename(placeholder, 20);
 
-        file_list.p[file_list.size].filename = reinterpret_cast<char*>(
-            malloc(filename.size() + 1));
-        memcpy(file_list.p[file_list.size].filename,
-            filename.c_str(), filename.size());
-        file_list.p[file_list.size].filename[filename.size()] = '\0';
+        path.filename = reinterpret_cast<char*>(malloc(filename.size() + 1));
+        memcpy(path.filename, filename.c_str(), filename.size());
+        path.filename[filename.size()] = '\0';
 
-        file_list.p[file_list.size].path = reinterpret_cast<char*>(
-            malloc(len + 1));
-        memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
-        file_list.p[file_list.size].path[len] = '\0';
-        file_list.p[file_list.size].size = len;
+        path.path = reinterpret_cast<char*>(malloc(len + 1));
+        memcpy(path.path, placeholder.c_str(), len);
+        path.path[len] = '\0';
+        path.size = len;
 
         auto file_extension = filename.substr(filename.find_last_of(".") + 1);
         auto filetype = ft::fileTypeFromStr(file_extension);
-        file_list.p[file_list.size].filetype = filetype;
+        path.filetype = filetype;
 
+        file_list.p = reinterpret_cast<paths*>(
+            realloc(file_list.p, sizeof(paths) * (file_list.size + 1)));
+
+        file_list.p[file_list.size] = path;
         file_list.size++;
     }
 }
