@@ -34,6 +34,10 @@ void FileEditor::createFileList() {
         memcpy(file_list.p[file_list.size].path, placeholder.c_str(), len);
         file_list.p[file_list.size].path[len] = '\0';
         file_list.p[file_list.size].size = len;
+
+        auto file_extension = filename.substr(filename.find_last_of(".") + 1);
+        file_list.p[file_list.size].filetype = fileTypeFromStr(file_extension);
+
         file_list.size++;
     }
 }
