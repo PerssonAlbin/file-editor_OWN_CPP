@@ -36,7 +36,7 @@ void FileEditor::createFileList() {
         file_list.p[file_list.size].size = len;
 
         auto file_extension = filename.substr(filename.find_last_of(".") + 1);
-        file_list.p[file_list.size].filetype = fileTypeFromStr(file_extension);
+        file_list.p[file_list.size].filetype = ft::fileTypeFromStr(file_extension);
 
         file_list.size++;
     }

@@ -31,7 +31,7 @@
 #define TAB_STOP 4
 #define QUIT_TIMES 2
 namespace fs = std::filesystem;
-using namespace filetype;
+namespace ft = filetype;
 
 class FileEditor {
  private:
@@ -57,7 +57,7 @@ class FileEditor {
     struct paths {
         char* filename;
         char* path;
-        FileType filetype;
+        ft::FileType filetype;
         int size;
     };
     struct file_path_list {
