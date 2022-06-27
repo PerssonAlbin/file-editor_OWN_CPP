@@ -13,14 +13,17 @@ void FileEditor::editorDrawRows() {
                     bufferAppend("~", 1);
                     padding--;
                 }
-                while (padding--) bufferAppend(" ", 1);
+                while (padding--)
+                    bufferAppend(" ", 1);
             } else {
                 bufferAppend("~", 1);
             }
         } else {
             int len = E.row[filerow].rsize - E.coloff;
-            if (len < 0) len = 0;
-            if (len > screencols) len = screencols;
+            if (len < 0)
+                len = 0;
+            if (len > screencols)
+                len = screencols;
             bufferAppend(&E.row[filerow].render[E.coloff], len);
         }
         bufferAppend(TERM_CLEAR_LINES, 3);
@@ -36,12 +39,13 @@ void FileEditor::editorDrawStatusBar() {
     char rstatus[80];
 
     int len = snprintf(status, sizeof(status), "%.20s %s",
-        file_list.p[file_number].filename ?
-        file_list.p[file_number].filename : "[No Name]",
-        E.dirty ? "(modified)" : "");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d",
-        c.y +1, E.numrows);
-    if (len > screencols) len = screencols;
+                       file_list.p[file_number].filename
+                           ? file_list.p[file_number].filename
+                           : "[No Name]",
+                       E.dirty ? "(modified)" : "");
+    int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d", c.y + 1, E.numrows);
+    if (len > screencols)
+        len = screencols;
     bufferAppend(status, len);
     while (len < screencols) {
         if (screencols - len == rlen) {
@@ -60,7 +64,8 @@ void FileEditor::editorDrawStatusBar() {
 void FileEditor::editorDrawMessageBar() {
     bufferAppend(TERM_CLEAR_LINES, 3);
     int msglen = strlen(E.statusmsg);
-    if (msglen > screencols) msglen = screencols;
+    if (msglen > screencols)
+        msglen = screencols;
     if (msglen && time(NULL) - E.statusmsg_time < 5)
         bufferAppend(E.statusmsg, msglen);
 }
@@ -90,34 +95,37 @@ void FileEditor::editorScroll() {
 void FileEditor::editorMoveCursor(int key) {
     /* Moves cursor based on cases it gets from */
 
-    erow *row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
+    erow* row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
     switch (key) {
-        case ARROW_LEFT:
-            if (c.x != 0) {
-                c.x--;
-            } else if (c.y > 0) {
-                c.y--;
-                c.x = E.row[c.y].size;
-            }
-            break;
-        case ARROW_RIGHT:
-            if (row && c.x < row->size) {
-                c.x++;
-            } else if (row && c.x == row->size) {
-                c.y++;
-                c.x = 0;
-            }
-            break;
-        case ARROW_UP:
-            if (c.y != 0) c.y--;
-            break;
-        case ARROW_DOWN:
-            if (c.y < E.numrows) c.y++;
-            break;
+    case ARROW_LEFT:
+        if (c.x != 0) {
+            c.x--;
+        } else if (c.y > 0) {
+            c.y--;
+            c.x = E.row[c.y].size;
+        }
+        break;
+    case ARROW_RIGHT:
+        if (row && c.x < row->size) {
+            c.x++;
+        } else if (row && c.x == row->size) {
+            c.y++;
+            c.x = 0;
+        }
+        break;
+    case ARROW_UP:
+        if (c.y != 0)
+            c.y--;
+        break;
+    case ARROW_DOWN:
+        if (c.y < E.numrows)
+            c.y++;
+        break;
     }
     row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
     int rowlen = row ? row->size : 0;
-    if (c.x > rowlen) c.x = rowlen;
+    if (c.x > rowlen)
+        c.x = rowlen;
 }
 
 /*Compensates the vertical position of the cursor since tabs take
@@ -127,7 +135,7 @@ int FileEditor::editorRowCxToRx() {
     int j;
     for (j = 0; j < c.x; j++) {
         if (E.row[c.y].chars[j] == TAB)
-        rx += (TAB_STOP - 1) - (rx % TAB_STOP);
+            rx += (TAB_STOP - 1) - (rx % TAB_STOP);
         rx++;
     }
     return rx;
@@ -148,7 +156,7 @@ void FileEditor::editorRefreshScreen() {
     char buf[32];
     // Tracks cursor
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (c.y - E.rowoff) + 1,
-        (c.rx - E.coloff) + 1);
+             (c.rx - E.coloff) + 1);
     bufferAppend(buf, strlen(buf));
 
     bufferAppend(TERM_SHOW_CURSOR, 6);
