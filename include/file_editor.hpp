@@ -2,6 +2,7 @@
 #ifndef INCLUDE_FILE_EDITOR_HPP_
 #define INCLUDE_FILE_EDITOR_HPP_
 
+#include "include/file_type.hpp"
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -22,7 +23,6 @@
 #include <unistd.h>
 #endif
 
-#include "include/file_type.hpp"
 #include "include/syntax_highlight.hpp"
 
 #define _BSD_SOURCE
