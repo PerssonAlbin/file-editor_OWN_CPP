@@ -8,7 +8,7 @@
 #include <algorithm>
 
 namespace filetype {
-    enum class FileType { md, cpp, txt };
+    enum class FileType { txt, md, cpp };
 
     FileType fileTypeFromStr(const std::string val);
     std::string fileTypeToStr(FileType type);
