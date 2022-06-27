@@ -2,7 +2,7 @@
 #include "include/file_editor.hpp"
 
 /*Removes the program from the screen and exits.*/
-void FileEditor::die(const char *s) {
+void FileEditor::die(const char* s) {
     write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
     write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
 

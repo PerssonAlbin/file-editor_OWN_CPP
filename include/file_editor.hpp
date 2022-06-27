@@ -2,42 +2,41 @@
 #ifndef INCLUDE_FILE_EDITOR_HPP_
 #define INCLUDE_FILE_EDITOR_HPP_
 
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdarg.h>
+#include "include/file_type.hpp"
+#include "include/syntax_highlight.hpp"
 #include <fcntl.h>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <stdarg.h>
+#include <string.h>
 #include <string>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
 #include <vector>
-#include <filesystem>
 
 #ifdef WINDOWS
-    #include <direct.h>
-    #include <windows.h>
+#include <direct.h>
+#include <windows.h>
 #else
-    #include <unistd.h>
+#include <unistd.h>
 #endif
-
-#include "include/syntax_highlight.hpp"
-#include "include/file_type.hpp"
 
 #define _BSD_SOURCE
 
-#define CTRL_KEY(k) ((k) & 0x1f)
+#define CTRL_KEY(k) ((k)&0x1f)
 #define TAB_STOP 4
 #define QUIT_TIMES 2
 namespace fs = std::filesystem;
 namespace ft = filetype;
 
 class FileEditor {
- private:
+  private:
     // Append buffer
     struct abuf {
-        char *b = reinterpret_cast<char*>(malloc(0));
+        char* b = reinterpret_cast<char*>(malloc(0));
         int len = 0;
     };
     abuf buffer;
@@ -46,7 +45,7 @@ class FileEditor {
     struct cursor {
         int x = 0;
         int y = 0;
-        int rx = 0;  // Position correction for tabs
+        int rx = 0; // Position correction for tabs
     };
     cursor c;
 
@@ -70,12 +69,12 @@ class FileEditor {
     typedef struct erow {
         int rsize = 0;
         int size = 0;
-        char *chars;
-        char *render;
+        char* chars;
+        char* render;
     } erow;
     struct editorConfig {
         int numrows = 0;
-        erow *row = NULL;
+        erow* row = NULL;
         int rowoff = 0;
         int coloff = 0;
         char statusmsg[80];
@@ -101,23 +100,23 @@ class FileEditor {
     };
 
     /* Init functions */
-    void die(const char *s);
+    void die(const char* s);
     void clearFileList();
 
     /* Buffer Functions */
-    void bufferAppend(const char *s, int len);
+    void bufferAppend(const char* s, int len);
     char* editorRowToString(int* buflen);
-    void editorUpdateRow(erow *row);
+    void editorUpdateRow(erow* row);
     void resetRows();
     void editorFlushRows();
-    void editorFreeRow(erow *row);
-    void editorInsertRow(int at, char *s, size_t len);
+    void editorFreeRow(erow* row);
+    void editorInsertRow(int at, char* s, size_t len);
     void editorRowInsertChar(int at, int input);
     void editorInsertChar(int read_key);
-    void editorRowDelChar(erow *row, int at_x, int at_y);
+    void editorRowDelChar(erow* row, int at_x, int at_y);
     void editorDelChar();
     void editorDelRow(int at);
-    void editorRowAppendString(erow *row, char *s, size_t len);
+    void editorRowAppendString(erow* row, char* s, size_t len);
     void editorInsertNewline();
 
     /* File functions */
@@ -125,16 +124,16 @@ class FileEditor {
     bool isDirectory(std::string path);
     std::string trimFilename(std::string filename, int length);
     void editorSave();
-    void editorOpen(char *filename);
+    void editorOpen(char* filename);
 
     /* Terminal functions */
     void enableRawMode();
     void disableRawMode();
-    int getWindowSize(int *rows, int *cols);
+    int getWindowSize(int* rows, int* cols);
     void editorSetStatusMessage(const char* fmt, ...);
     int editorReadKey();
     bool editorProcessKeypress();
-    int getCursorPosition(int *rows, int *cols);
+    int getCursorPosition(int* rows, int* cols);
 
     /* Editor functions */
     void editorRefreshScreen();
@@ -157,7 +156,7 @@ class FileEditor {
     inline static const char* TERM_SHOW_CURSOR = "\x1b[?25h";
     inline static const char* TERM_HIDE_CURSOR = "\x1b[?25l";
 
- public:
+  public:
     // Init
     explicit FileEditor(std::string argv);
 
@@ -168,4 +167,4 @@ class FileEditor {
     void runtime();
 };
 
-#endif  // INCLUDE_FILE_EDITOR_HPP_
+#endif // INCLUDE_FILE_EDITOR_HPP_

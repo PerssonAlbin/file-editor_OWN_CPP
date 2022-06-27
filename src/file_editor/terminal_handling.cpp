@@ -22,7 +22,7 @@ void FileEditor::enableRawMode() {
 }
 
 /*Gets current size of the terminal window.*/
-int FileEditor::getWindowSize(int *rows, int *cols) {
+int FileEditor::getWindowSize(int* rows, int* cols) {
     struct winsize ws;
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         // Moves cursor
@@ -49,7 +49,7 @@ void FileEditor::editorSetStatusMessage(const char* fmt, ...) {
 /*Runs if the normal way of retrieving the window size doesnt work.
 Runs by placing the mouse as far as possible into the corner while
 still visible to determine window size.*/
-int FileEditor::getCursorPosition(int *rows, int *cols) {
+int FileEditor::getCursorPosition(int* rows, int* cols) {
     char buf[32];
     unsigned int i = 0;
     if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) {
@@ -74,7 +74,6 @@ int FileEditor::getCursorPosition(int *rows, int *cols) {
     return 0;
 }
 
-
 /*Detects new input and formats it into a int.*/
 int FileEditor::editorReadKey() {
     int nread;
@@ -95,32 +94,48 @@ int FileEditor::editorReadKey() {
         }
         if (seq[0] == '[') {
             if (seq[1] >= '0' && seq[1] <= '9') {
-                if (read(STDIN_FILENO, &seq[2], 1) != 1) return TERM_ESC;
+                if (read(STDIN_FILENO, &seq[2], 1) != 1)
+                    return TERM_ESC;
                 if (seq[2] == '~') {
                     switch (seq[1]) {
-                        case '1': return HOME_KEY;
-                        case '3': return DEL_KEY;
-                        case '4': return END_KEY;
-                        case '5': return PAGE_UP;
-                        case '6': return PAGE_DOWN;
-                        case '7': return HOME_KEY;
-                        case '8': return END_KEY;
+                    case '1':
+                        return HOME_KEY;
+                    case '3':
+                        return DEL_KEY;
+                    case '4':
+                        return END_KEY;
+                    case '5':
+                        return PAGE_UP;
+                    case '6':
+                        return PAGE_DOWN;
+                    case '7':
+                        return HOME_KEY;
+                    case '8':
+                        return END_KEY;
                     }
                 }
             } else {
                 switch (seq[1]) {
-                    case 'A': return ARROW_UP;
-                    case 'B': return ARROW_DOWN;
-                    case 'C': return ARROW_RIGHT;
-                    case 'D': return ARROW_LEFT;
-                    case 'H': return HOME_KEY;
-                    case 'F': return END_KEY;
+                case 'A':
+                    return ARROW_UP;
+                case 'B':
+                    return ARROW_DOWN;
+                case 'C':
+                    return ARROW_RIGHT;
+                case 'D':
+                    return ARROW_LEFT;
+                case 'H':
+                    return HOME_KEY;
+                case 'F':
+                    return END_KEY;
                 }
             }
         } else if (seq[0] == 'O') {
             switch (seq[1]) {
-                case 'H': return HOME_KEY;
-                case 'F': return END_KEY;
+            case 'H':
+                return HOME_KEY;
+            case 'F':
+                return END_KEY;
             }
         }
         return TERM_ESC;
@@ -134,76 +149,73 @@ bool FileEditor::editorProcessKeypress() {
     static int quit_times = QUIT_TIMES;
     int read_key = editorReadKey();
     switch (read_key) {
-        case '\r':
-            editorInsertNewline();
-            break;
-        case CTRL_KEY('q'):
-            if (E.dirty && quit_times > 0) {
-                editorSetStatusMessage(
-                    "File has unsaved changes. Press Ctrl-Q again to quit");
-                quit_times--;
-                return true;
-            }
-            write(STDOUT_FILENO, "\x1b[2J", 4);
-            write(STDOUT_FILENO, "\x1b[H", 3);
-            return false;
-            break;
-        case CTRL_KEY('s'):
-            editorSave();
-            break;
-        // Experimental, needs to skip executables.
-        case CTRL_KEY('w'):
-            write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
-            write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
-            if (file_number >= 0 && file_number < file_list.size) {
-                file_number++;
-                resetRows();
-                editorOpen(file_list.p[file_number].path);
-            }
-            break;
-        case HOME_KEY:
-            c.x = 0;
-            break;
-        case END_KEY:
-            {
-                if (c.y < E.numrows)
-                    c.x = E.row[c.y].size;
-            }
-            break;
-        case BACKSPACE:
-        case CTRL_KEY('h'):
-        case DEL_KEY:
-            if (read_key == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
-            editorDelChar();
-            break;
-        case PAGE_UP:
-        case PAGE_DOWN:
-            {
-                if (read_key == PAGE_UP) {
-                    c.y = E.rowoff;
-                } else if (read_key == PAGE_DOWN) {
-                    c.y = E.rowoff + screenrows - 1;
-                    if (c.y > E.numrows) c.y = E.numrows;
-                }
+    case '\r':
+        editorInsertNewline();
+        break;
+    case CTRL_KEY('q'):
+        if (E.dirty && quit_times > 0) {
+            editorSetStatusMessage(
+                "File has unsaved changes. Press Ctrl-Q again to quit");
+            quit_times--;
+            return true;
+        }
+        write(STDOUT_FILENO, "\x1b[2J", 4);
+        write(STDOUT_FILENO, "\x1b[H", 3);
+        return false;
+        break;
+    case CTRL_KEY('s'):
+        editorSave();
+        break;
+    // Experimental, needs to skip executables.
+    case CTRL_KEY('w'):
+        write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
+        write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
+        if (file_number >= 0 && file_number < file_list.size) {
+            file_number++;
+            resetRows();
+            editorOpen(file_list.p[file_number].path);
+        }
+        break;
+    case HOME_KEY:
+        c.x = 0;
+        break;
+    case END_KEY: {
+        if (c.y < E.numrows)
+            c.x = E.row[c.y].size;
+    } break;
+    case BACKSPACE:
+    case CTRL_KEY('h'):
+    case DEL_KEY:
+        if (read_key == DEL_KEY)
+            editorMoveCursor(ARROW_RIGHT);
+        editorDelChar();
+        break;
+    case PAGE_UP:
+    case PAGE_DOWN: {
+        if (read_key == PAGE_UP) {
+            c.y = E.rowoff;
+        } else if (read_key == PAGE_DOWN) {
+            c.y = E.rowoff + screenrows - 1;
+            if (c.y > E.numrows)
+                c.y = E.numrows;
+        }
 
-                int times = screenrows;
-                while (times--)
-                    editorMoveCursor(read_key == PAGE_UP ?
-                        ARROW_UP : ARROW_DOWN);
-            }
-            break;
-        case ARROW_UP:
-        case ARROW_DOWN:
-        case ARROW_LEFT:
-        case ARROW_RIGHT:
-            editorMoveCursor(read_key);
-            break;
-        case CTRL_KEY('l'):
-        case TERM_ESC:
-            break;
-        default:
-            editorInsertChar(read_key);
-            break;
+        int times = screenrows;
+        while (times--)
+            editorMoveCursor(read_key == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+    } break;
+    case ARROW_UP:
+    case ARROW_DOWN:
+    case ARROW_LEFT:
+    case ARROW_RIGHT:
+        editorMoveCursor(read_key);
+        break;
+    case CTRL_KEY('l'):
+    case TERM_ESC:
+        break;
+    default:
+        editorInsertChar(read_key);
+        break;
     }
     quit_times = QUIT_TIMES;
     return true;
