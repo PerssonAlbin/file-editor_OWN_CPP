@@ -1,4 +1,5 @@
 // Copyright 2022 Andreas Bauer
+#include "test/doctest.h"
 
 #include "include/file_type.hpp"
 
@@ -29,12 +30,33 @@ namespace filetype {
 
         auto isMarkdown = "md" == lower_ext || "markdown" == lower_ext ||
                           "mdown" == lower_ext || "mkdn" == lower_ext ||
-                          "mkd" == lower_ext || "Rmd" == lower_ext;
+                          "mkd" == lower_ext || "rmd" == lower_ext;
         if (isMarkdown) {
             return FileType::md;
         }
 
         return FileType::txt;
+    }
+
+    TEST_CASE("should return correct FileType") {
+        CHECK(fileTypeFromStr("") == FileType::txt);
+        CHECK(fileTypeFromStr("UNKNOWN") == FileType::txt);
+
+        CHECK(fileTypeFromStr("c") == FileType::cpp);
+        CHECK(fileTypeFromStr("cc") == FileType::cpp);
+        CHECK(fileTypeFromStr("cpp") == FileType::cpp);
+        CHECK(fileTypeFromStr("h") == FileType::cpp);
+        CHECK(fileTypeFromStr("hpp") == FileType::cpp);
+
+        CHECK(fileTypeFromStr("md") == FileType::md);
+        CHECK(fileTypeFromStr("mkdn") == FileType::md);
+        CHECK(fileTypeFromStr("mdown") == FileType::md);
+        CHECK(fileTypeFromStr("markdown") == FileType::md);
+        CHECK(fileTypeFromStr("mkd") == FileType::md);
+        CHECK(fileTypeFromStr("rmd") == FileType::md);
+
+        CHECK(fileTypeFromStr("CPP") == FileType::cpp);
+        CHECK(fileTypeFromStr("cPp") == FileType::cpp);
     }
 
 } // namespace filetype
