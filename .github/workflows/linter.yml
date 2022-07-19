@@ -53,5 +53,6 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_CLANG_FORMAT: true
+          FILTER_REGEX_EXCLUDE: .*test/doctest.h
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
