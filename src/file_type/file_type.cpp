@@ -1,4 +1,5 @@
 // Copyright 2022 Andreas Bauer
+#include "test/doctest.h"
 
 #include "include/file_type.hpp"
 
@@ -29,7 +30,7 @@ namespace filetype {
 
         auto isMarkdown = "md" == lower_ext || "markdown" == lower_ext ||
                           "mdown" == lower_ext || "mkdn" == lower_ext ||
-                          "mkd" == lower_ext || "Rmd" == lower_ext;
+                          "mkd" == lower_ext || "rmd" == lower_ext;
         if (isMarkdown) {
             return FileType::md;
         }
