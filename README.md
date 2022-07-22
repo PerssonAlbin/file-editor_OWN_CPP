@@ -31,6 +31,14 @@ On macOS: `brew install cmake`
 
 ## Build
 
+To unit test build run:
+
+```shell
+cmake .
+make
+./bin/file-editor.out --exit
+```
+
 To create a debug build run:
 
 ```shell
