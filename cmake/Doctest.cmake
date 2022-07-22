@@ -1,5 +1,5 @@
 # Add doctest to the build if needed
-if(ENABLE_DOCTESTS)
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     add_definitions(-DENABLE_DOCTEST_IN_LIBRARY)
     include(FetchContent)
     FetchContent_Declare(
