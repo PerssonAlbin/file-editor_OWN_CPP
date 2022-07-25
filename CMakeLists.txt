@@ -15,6 +15,9 @@ add_executable(file-editor.out
     src/file_editor/file_handling.cpp
     src/file_editor/terminal_handling.cpp
     src/syntax/syntax_highlight.cpp
+    src/file_type/file_type.cpp
     include/file_editor.hpp
     include/syntax_highlight.hpp
-    src/file_type/file_type.cpp)
+    test/doctest.h
+    test/file_type/file_type_test.cpp
+    )
