@@ -29,4 +29,4 @@ jobs:
 
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ls -al
+        run: ./bin/file-editor.out --exit --no-intro
