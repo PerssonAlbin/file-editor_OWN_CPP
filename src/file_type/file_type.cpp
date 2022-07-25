@@ -1,6 +1,4 @@
 // Copyright 2022 Andreas Bauer
-#include "test/doctest.h"
-
 #include "include/file_type.hpp"
 
 namespace filetype {
