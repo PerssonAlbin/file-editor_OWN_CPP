@@ -4,19 +4,6 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    // doctest::Context context;
-    // context.applyCommandLine(argc, argv);
-    // Don't break in the debugger when assertions fail
-    // context.setOption("no-breaks", true);
-
-    // int res = context.run(); // run doctest
-
-    // important - query flags (and --exit) rely on the user doing this
-    // if (context.shouldExit()) {
-    // propagate the result of the tests
-    //     return res;
-    // }
-
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " [path to dir]" << std::endl;
         return -1;
