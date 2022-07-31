@@ -34,16 +34,18 @@ On macOS: `brew install cmake`
 To unit test build run:
 
 ```shell
-cmake .
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .
 make
-./bin/file-editor.out --exit
+./unit_tests
 ```
 
 To create a debug build run:
 
 ```shell
-cmake .
+cmake -DCMAKE_BUILD_TYPE=Debug .
 make
+../bin/file_editor.out
 ```
 
 To create a release build run:
@@ -51,6 +53,7 @@ To create a release build run:
 ```shell
 cmake -DCMAKE_BUILD_TYPE=Release .
 make
+../bin/file_editor.out
 ```
 
 This will create an executable binary in the `bin/` folder.

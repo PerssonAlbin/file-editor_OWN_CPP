@@ -9,7 +9,6 @@ include(ConfigSafeGuards)
 include(Doctest)
 
 set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DDOCTEST_CONFIG_DISABLE -DENABLE_DOCTESTS=OFF")
 set(EXECUTABLE_OUTPUT_PATH ../bin/)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -21,9 +20,6 @@ set(SOURCES
     src/file_editor/terminal_handling.cpp
     src/syntax/syntax_highlight.cpp
     src/file_type/file_type.cpp)
-
-set(TESTFILES
-    tests/main.cpp)
 
 set(LIBRARY_NAME editor)
 
