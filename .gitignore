@@ -5,7 +5,7 @@
 
 # Generated files
 *.txt
-*.cmake
+cmake_install.cmake
 Makefile
 build/*
 .cache/

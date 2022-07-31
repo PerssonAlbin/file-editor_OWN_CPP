@@ -1,23 +1,9 @@
 // Copyright 2022 Albin Persson
 
-#define DOCTEST_CONFIG_IMPLEMENT
-
 #include "include/file_editor.hpp"
-#include "test/doctest.h"
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    doctest::Context context;
-    context.applyCommandLine(argc, argv);
-
-    int res = context.run(); // run doctest
-
-    // important - query flags (and --exit) rely on the user doing this
-    if (context.shouldExit()) {
-        // propagate the result of the tests
-        return res;
-    }
-
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " [path to dir]" << std::endl;
         return -1;

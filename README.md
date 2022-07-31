@@ -31,18 +31,31 @@ On macOS: `brew install cmake`
 
 ## Build
 
+To unit test build run:
+
+```shell
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .
+make
+./unit_tests
+```
+
 To create a debug build run:
 
 ```shell
-cmake .
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .
 make
+../bin/file_editor.out
 ```
 
 To create a release build run:
 
 ```shell
+mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release .
 make
+../bin/file_editor.out
 ```
 
 This will create an executable binary in the `bin/` folder.
