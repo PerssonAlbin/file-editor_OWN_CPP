@@ -43,6 +43,7 @@ make
 To create a debug build run:
 
 ```shell
+mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Debug .
 make
 ../bin/file_editor.out
@@ -51,6 +52,7 @@ make
 To create a release build run:
 
 ```shell
+mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release .
 make
 ../bin/file_editor.out
