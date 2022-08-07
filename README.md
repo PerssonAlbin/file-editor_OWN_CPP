@@ -31,34 +31,33 @@ On macOS: `brew install cmake`
 
 ## Build
 
-To unit test build run:
+To unit test and debug build run:
 
 ```shell
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug .
+cmake -DCMAKE_BUILD_TYPE=Debug . -B./build
+cd build
 make
-./unit_tests
+```
+### Run debug build
+```shell
+./file_editor.out
 ```
 
-To create a debug build run:
-
+### Run unit tests
 ```shell
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Debug .
-make
-../bin/file_editor.out
+./unit_tests
 ```
 
 To create a release build run:
 
 ```shell
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release .
+cmake -DCMAKE_BUILD_TYPE=Release . -B./build
+cd build
 make
-../bin/file_editor.out
+./file_editor.out
 ```
 
-This will create an executable binary in the `bin/` folder.
+This will create an executable binary in the `build/` folder.
 
 If you are using Visual Studio Code then we recommend the [CMake Tools Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) to build, debug, and run the application.
 
