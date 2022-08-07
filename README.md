@@ -37,14 +37,11 @@ To unit test and debug build run:
 cmake -DCMAKE_BUILD_TYPE=Debug . -B./build
 cd build
 make
-```
-### Run debug build
-```shell
-./file_editor.out
-```
 
-### Run unit tests
-```shell
+# Run debug build
+./file_editor.out
+
+# Run unit tests
 ./unit_tests
 ```
 
