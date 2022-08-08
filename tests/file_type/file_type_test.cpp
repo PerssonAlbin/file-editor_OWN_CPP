@@ -1,5 +1,5 @@
+#include "doctest/doctest.h"
 #include "include/file_type.hpp"
-#include "test/doctest.h"
 
 namespace filetype {
 
