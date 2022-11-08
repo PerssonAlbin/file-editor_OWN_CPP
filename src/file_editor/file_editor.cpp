@@ -54,7 +54,7 @@ void FileEditor::runtime(bool loop) {
     screenrows -= 2;
     editorOpen(file_list.p[file_number].path);
     editorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
-    while (this->no_gui) {
+    while (this->no_gui && loop) {
         editorRefreshScreen();
         loop = editorProcessKeypress();
     }
