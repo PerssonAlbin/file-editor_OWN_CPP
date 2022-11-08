@@ -6,7 +6,6 @@
 #include "include/syntax_highlight.hpp"
 #include <fcntl.h>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <stdarg.h>
 #include <string.h>
@@ -33,7 +32,7 @@ namespace fs = std::filesystem;
 namespace ft = filetype;
 
 class FileEditor {
-  private:
+  public:
     // Append buffer
     struct abuf {
         char* b = reinterpret_cast<char*>(malloc(0));
@@ -156,6 +155,9 @@ class FileEditor {
     inline static const char* TERM_SHOW_CURSOR = "\x1b[?25h";
     inline static const char* TERM_HIDE_CURSOR = "\x1b[?25l";
 
+    /* Runs if tests are to be made */
+    bool no_gui;
+
   public:
     // Init
     explicit FileEditor(std::string argv);
@@ -164,7 +166,7 @@ class FileEditor {
     ~FileEditor();
 
     // Main function
-    void runtime();
+    void runtime(bool loop = true);
 };
 
 #endif // INCLUDE_FILE_EDITOR_HPP_

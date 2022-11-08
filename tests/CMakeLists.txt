@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 
 set(TESTFILES
     main.cpp
-    file_type/file_type_test.cpp)
+    file_type/file_type_test.cpp
+    file_editor/buffer_handling_test.cpp)
 
 set(TEST_MAIN unit_tests)
 set(TEST_RUNNER_PARAMS "")

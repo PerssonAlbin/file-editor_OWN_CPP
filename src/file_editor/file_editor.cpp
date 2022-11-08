@@ -33,21 +33,28 @@ FileEditor::~FileEditor() {
     free(buffer.b);
     editorFlushRows();
     clearFileList();
-    disableRawMode();
+    if (this->no_gui) {
+        disableRawMode();
+    }
 }
 
-/* Main function */
-void FileEditor::runtime() {
-    enableRawMode();
-    if (getWindowSize(&screenrows, &screencols) == -1) {
-        die("getWindowSize");
+/* Main function
+Doesnt run if the loop if test mode */
+void FileEditor::runtime(bool loop) {
+    this->no_gui = loop;
+
+    if (this->no_gui) {
+        enableRawMode();
+
+        if (getWindowSize(&screenrows, &screencols) == -1) {
+            die("getWindowSize");
+        }
     }
     // Compensate for having a status bar
     screenrows -= 2;
     editorOpen(file_list.p[file_number].path);
     editorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit");
-    bool loop = true;
-    while (loop) {
+    while (this->no_gui) {
         editorRefreshScreen();
         loop = editorProcessKeypress();
     }
