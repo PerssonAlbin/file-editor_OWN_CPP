@@ -69,7 +69,8 @@ class FileEditor {
     typedef struct erow {
         int rsize = 0;
         int size = 0;
-        char* chars;
+        // char* chars;
+        std::string chars;
         char* render;
     } erow;
     struct editorConfig {
@@ -105,7 +106,7 @@ class FileEditor {
 
     /* Buffer Functions */
     void bufferAppend(const char* s, int len);
-    char* editorRowToString(int* buflen);
+    std::vector<std::string> editorRowToString(int* buflen);
     void editorUpdateRow(erow* row);
     void resetRows();
     void editorFlushRows();

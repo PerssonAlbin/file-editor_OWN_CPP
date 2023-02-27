@@ -17,7 +17,7 @@ class SyntaxHighlight {
 
   public:
     unsigned int added_length = 0;
-    std::string hightlightLine(char* line, char* filename);
+    std::string hightlightLine(std::string line, char* filename);
 };
 
 #endif // INCLUDE_SYNTAX_HIGHLIGHT_HPP_

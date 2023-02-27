@@ -19,20 +19,22 @@ void FileEditor::bufferAppend(const char* s, int len) {
     buffer.len += len;
 }
 
-char* FileEditor::editorRowToString(int* buflen) {
-    int totlen = 0;
+std::vector<std::string> FileEditor::editorRowToString(int* buflen) {
+    // int totlen = 0;
     int j;
-    for (j = 0; j < E.numrows; j++)
-        totlen += E.row[j].size + 1;
-    *buflen = totlen;
+    // for (j = 0; j < E.numrows; j++)
+    //     totlen += E.row[j].size + 1;
+    // *buflen = totlen;
 
-    char* buf = reinterpret_cast<char*>(malloc(totlen));
-    char* p = buf;
+    // char* buf = reinterpret_cast<char*>(malloc(totlen));
+    std::vector<std::string> buf;
+    // char* p = buf;
     for (j = 0; j < E.numrows; j++) {
-        memcpy(p, E.row[j].chars, E.row[j].size);
-        p += E.row[j].size;
-        *p = '\n';
-        p++;
+        // memcpy(p, E.row[j].chars, E.row[j].size);
+        // buf p += E.row[j].size;
+        // *p = '\n';
+        // p++;
+        buf.push_back(E.row[j].chars);
     }
     return buf;
 }

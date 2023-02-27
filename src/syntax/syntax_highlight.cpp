@@ -41,7 +41,7 @@ std::string SyntaxHighlight::injectColor(std::string s_text,
     return s_text;
 }
 
-std::string SyntaxHighlight::hightlightLine(char* line, char* file_ext) {
+std::string SyntaxHighlight::hightlightLine(std::string line, char* file_ext) {
     int c = detectFiletype(file_ext);
 
     switch (c) {
