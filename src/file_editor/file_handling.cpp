@@ -59,10 +59,8 @@ void FileEditor::editorSave() {
     int len;
     std::vector<std::string> buf = editorRowToString(&len);
     // int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
-    std::fstream file;
-    std::cout << "Attempt to open file: " << file_list.p[file_number].path
-              << std::endl;
-    file.open(file_list.p[file_number].path, std::ios_base::out);
+    std::ofstream file;
+    file.open(file_list.p[file_number].path, std::ofstream::trunc);
     // if (file != -1) {
     // if (ftruncate(fd, len) != -1) {
     for (int i = 0; i < buf.size(); i++) {
@@ -95,10 +93,10 @@ void FileEditor::editorOpen(char* filename) {
     size_t linecap = 0;
     ssize_t linelen;
     while ((linelen = getline(&line, &linecap, fp)) != -1) {
-        while (linelen > 0 &&
-               (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
-            linelen--;
         line_str = line;
+        while (line_str.size() > 0 && (line_str[line_str.size() - 1] == '\n' ||
+                                       line_str[line_str.size() - 1] == '\r'))
+            line_str.erase(line_str.size() - 1, 1);
         editorInsertRow(E.numrows, line_str, linelen);
     }
     free(line);

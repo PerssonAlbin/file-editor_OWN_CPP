@@ -43,7 +43,8 @@ std::vector<std::string> FileEditor::editorRowToString(int* buflen) {
 void FileEditor::editorUpdateRow(erow* row) {
     int tabs = 0;
     int j;
-    for (j = 0; j < row->chars.size() - 1; j++) {
+    row->size = row->chars.size();
+    for (j = 0; j < row->chars.size(); j++) {
         if (row->chars[j] == TAB)
             tabs++;
     }
