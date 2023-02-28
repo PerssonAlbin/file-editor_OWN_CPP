@@ -43,7 +43,7 @@ std::vector<std::string> FileEditor::editorRowToString(int* buflen) {
 void FileEditor::editorUpdateRow(erow* row) {
     int tabs = 0;
     int j;
-    for (j = 0; j < row->size; j++) {
+    for (j = 0; j < row->chars.size() - 1; j++) {
         if (row->chars[j] == TAB)
             tabs++;
     }
@@ -72,23 +72,27 @@ void FileEditor::editorUpdateRow(erow* row) {
 }
 
 /*Appends a char string to a char string inside a row.*/
-void FileEditor::editorInsertRow(int at, char* s, size_t len) {
+void FileEditor::editorInsertRow(int at, std::string s, size_t len) {
     if (at < 0 || at > E.numrows) {
         return;
     }
     // Extends the amount of rows by one
-    E.row =
-        reinterpret_cast<erow*>(realloc(E.row, sizeof(erow) * (E.numrows + 1)));
+    erow temp_row = {0, 0, s, NULL};
+    E.row.push_back(temp_row);
+    // E.row =
+    //    reinterpret_cast<erow*>(realloc(E.row, sizeof(erow) * (E.numrows +
+    //    1)));
     // Moves the rows 1 step down from the current position
     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
     // In case the row is cut off in the middle this makes sure the length
     // reflects that
     E.row[at].size = len;
-    // E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
-    // Copies from the mouse x point and forward len characters
-    // memcpy(E.row[at].chars, s, len);
-    E.row[at].chars[len] = END_OF_ROW;
+    // E.row[at].chars = s;
+    //  E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
+    //  Copies from the mouse x point and forward len characters
+    //  memcpy(E.row[at].chars, s, len);
+    //  E.row[at].chars[len] = END_OF_ROW;
 
     E.row[at].rsize = 0;
     E.row[at].render = NULL;
@@ -140,6 +144,7 @@ void FileEditor::resetRows() {
 /* Frees one row */
 void FileEditor::editorFreeRow(erow* row) {
     // free(row->chars);
+    row->chars = "";
     free(row->render);
 }
 
@@ -150,8 +155,8 @@ void FileEditor::editorFlushRows() {
         editorFreeRow(&E.row[x]);
         x += 1;
     }
-    free(E.row);
-    E.row = NULL;
+    // free(E.row);
+    // E.row = NULL;
 }
 
 void FileEditor::editorDelRow(int at) {

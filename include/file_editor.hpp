@@ -69,13 +69,13 @@ class FileEditor {
     typedef struct erow {
         int rsize = 0;
         int size = 0;
-        // char* chars;
         std::string chars;
         char* render;
     } erow;
     struct editorConfig {
         int numrows = 0;
-        erow* row = NULL;
+        // erow* row = NULL;
+        std::vector<erow> row;
         int rowoff = 0;
         int coloff = 0;
         char statusmsg[80];
@@ -111,7 +111,7 @@ class FileEditor {
     void resetRows();
     void editorFlushRows();
     void editorFreeRow(erow* row);
-    void editorInsertRow(int at, char* s, size_t len);
+    void editorInsertRow(int at, std::string s, size_t len);
     void editorRowInsertChar(int at, int input);
     void editorInsertChar(int read_key);
     void editorRowDelChar(erow* row, int at_x, int at_y);

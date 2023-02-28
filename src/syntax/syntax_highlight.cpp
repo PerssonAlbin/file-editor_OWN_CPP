@@ -58,7 +58,7 @@ std::string SyntaxHighlight::hightlightLine(std::string line, char* file_ext) {
     }
 }
 
-std::string SyntaxHighlight::cppStyle(char* line) {
+std::string SyntaxHighlight::cppStyle(std::string line) {
     // Regex combinations
     auto const regex_string = std::regex("\".*\"");
     auto const regex_comment = std::regex("(//).*");

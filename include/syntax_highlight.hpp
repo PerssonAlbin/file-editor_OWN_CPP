@@ -11,7 +11,7 @@
 class SyntaxHighlight {
   private:
     int comment_index = -1;
-    std::string cppStyle(char* line);
+    std::string cppStyle(std::string line);
     int detectFiletype(char* filename);
     std::string injectColor(std::string search_text, std::regex regex_check);
 

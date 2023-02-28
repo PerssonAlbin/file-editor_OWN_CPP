@@ -57,21 +57,30 @@ void FileEditor::editorSave() {
     }
 
     int len;
-    char* buf = editorRowToString(&len);
-    int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
-    if (fd != -1) {
-        if (ftruncate(fd, len) != -1) {
-            if (write(fd, buf, len) == len) {
-                close(fd);
-                free(buf);
-                E.dirty = 0;
-                editorSetStatusMessage("%d bytes written to disk", len);
-                return;
-            }
-        }
-        close(fd);
+    std::vector<std::string> buf = editorRowToString(&len);
+    // int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
+    std::fstream file;
+    std::cout << "Attempt to open file: " << file_list.p[file_number].path
+              << std::endl;
+    file.open(file_list.p[file_number].path, std::ios_base::out);
+    // if (file != -1) {
+    // if (ftruncate(fd, len) != -1) {
+    for (int i = 0; i < buf.size(); i++) {
+        // if (write(fd, buf, len) == len) {
+        // close(fd);
+        // free(buf);
+        file << buf[i] << std::endl;
+        E.dirty = 0;
+        editorSetStatusMessage("%d bytes written to disk", len);
+        // return;
+        //  }
     }
-    free(buf);
+    file.close();
+    return;
+    //}
+    // close(fd);
+    //}
+    // free(buf);
     editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 
@@ -82,13 +91,15 @@ void FileEditor::editorOpen(char* filename) {
         die("fopen");
 
     char* line = NULL;
+    std::string line_str = "";
     size_t linecap = 0;
     ssize_t linelen;
     while ((linelen = getline(&line, &linecap, fp)) != -1) {
         while (linelen > 0 &&
                (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
             linelen--;
-        editorInsertRow(E.numrows, line, linelen);
+        line_str = line;
+        editorInsertRow(E.numrows, line_str, linelen);
     }
     free(line);
     fclose(fp);
