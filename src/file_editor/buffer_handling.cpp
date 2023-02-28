@@ -76,14 +76,18 @@ void FileEditor::editorInsertRow(int at, char* s, size_t len) {
     if (at < 0 || at > E.numrows) {
         return;
     }
-
+    // Extends the amount of rows by one
     E.row =
         reinterpret_cast<erow*>(realloc(E.row, sizeof(erow) * (E.numrows + 1)));
+    // Moves the rows 1 step down from the current position
     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
+    // In case the row is cut off in the middle this makes sure the length
+    // reflects that
     E.row[at].size = len;
-    E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
-    memcpy(E.row[at].chars, s, len);
+    // E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
+    // Copies from the mouse x point and forward len characters
+    // memcpy(E.row[at].chars, s, len);
     E.row[at].chars[len] = END_OF_ROW;
 
     E.row[at].rsize = 0;
@@ -98,13 +102,18 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     if (at < 0 || at > E.row[c.y].size) {
         at = E.row[c.y].size;
     }
-    E.row[c.y].chars =
-        reinterpret_cast<char*>(realloc(E.row[c.y].chars, E.row[c.y].size + 2));
+    // E.row[c.y].chars =
+    //      reinterpret_cast<char*>(realloc(E.row[c.y].chars, E.row[c.y].size +
+    //      2));
 
-    memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at],
-            E.row[c.y].size - at);
+    // memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at],
+    //          E.row[c.y].size - at);
+    char c_input = input;
+    std::string str_input = &c_input;
+    E.row[c.y].chars.insert(at, str_input);
+
     E.row[c.y].size++;
-    E.row[c.y].chars[at] = input;
+    // E.row[c.y].chars[at] = input;
     editorUpdateRow(&E.row[c.y]);
     E.dirty++;
 }
@@ -130,7 +139,7 @@ void FileEditor::resetRows() {
 
 /* Frees one row */
 void FileEditor::editorFreeRow(erow* row) {
-    free(row->chars);
+    // free(row->chars);
     free(row->render);
 }
 
@@ -184,10 +193,11 @@ void FileEditor::editorDelChar() {
     }
 }
 
-void FileEditor::editorRowAppendString(erow* row, char* s, size_t len) {
-    row->chars =
-        reinterpret_cast<char*>(realloc(row->chars, row->size + len + 1));
-    memcpy(&row->chars[row->size], s, len);
+void FileEditor::editorRowAppendString(erow* row, std::string s, size_t len) {
+    // row->chars =
+    //     reinterpret_cast<char*>(realloc(row->chars, row->size + len + 1));
+    // memcpy(&row->chars[row->size], s, len);
+    row->chars.insert(row->size, s);
     row->size += len;
     row->chars[row->size] = END_OF_ROW;
     editorUpdateRow(row);

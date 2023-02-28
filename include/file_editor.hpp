@@ -117,7 +117,7 @@ class FileEditor {
     void editorRowDelChar(erow* row, int at_x, int at_y);
     void editorDelChar();
     void editorDelRow(int at);
-    void editorRowAppendString(erow* row, char* s, size_t len);
+    void editorRowAppendString(erow* row, std::string s, size_t len);
     void editorInsertNewline();
 
     /* File functions */
