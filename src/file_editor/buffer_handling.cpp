@@ -78,13 +78,23 @@ void FileEditor::editorInsertRow(int at, std::string s, size_t len) {
         return;
     }
     // Extends the amount of rows by one
-    erow temp_row = {0, 0, s, NULL};
-    E.row.push_back(temp_row);
+    if (at == E.row.size()) {
+        erow temp_row = {0, 0, s, NULL};
+        E.row.push_back(temp_row);
+    } else {
+        // Erases from the "old" row so that that only whats before the mouse
+        // remains
+        E.row[at - 1].chars.erase(E.row[at - 1].chars.size() - s.size(),
+                                  s.size());
+        // Adds a new row with the string to the right of the mouse
+        erow temp_row = {0, 0, s, NULL};
+        E.row.insert(E.row.begin() + at, temp_row);
+    }
     // E.row =
     //    reinterpret_cast<erow*>(realloc(E.row, sizeof(erow) * (E.numrows +
     //    1)));
     // Moves the rows 1 step down from the current position
-    memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
+    // memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
 
     // In case the row is cut off in the middle this makes sure the length
     // reflects that
