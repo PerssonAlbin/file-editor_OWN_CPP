@@ -102,13 +102,13 @@ void FileEditor::editorMoveCursor(int key) {
             c.x--;
         } else if (c.y > 0) {
             c.y--;
-            c.x = E.row[c.y].size;
+            c.x = E.row[c.y].chars.size();
         }
         break;
     case ARROW_RIGHT:
-        if (row && c.x < row->size) {
+        if (row && c.x < row->chars.size()) {
             c.x++;
-        } else if (row && c.x == row->size) {
+        } else if (row && c.x == row->chars.size()) {
             c.y++;
             c.x = 0;
         }
@@ -123,7 +123,7 @@ void FileEditor::editorMoveCursor(int key) {
         break;
     }
     row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
-    int rowlen = row ? row->size : 0;
+    int rowlen = row ? row->chars.size() : 0;
     if (c.x > rowlen)
         c.x = rowlen;
 }

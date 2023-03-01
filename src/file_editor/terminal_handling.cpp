@@ -182,7 +182,7 @@ bool FileEditor::editorProcessKeypress() {
         break;
     case END_KEY: {
         if (c.y < E.numrows)
-            c.x = E.row[c.y].size;
+            c.x = E.row[c.y].chars.size();
     } break;
     case BACKSPACE:
     case CTRL_KEY('h'):

@@ -56,29 +56,17 @@ void FileEditor::editorSave() {
         return;
     }
 
-    int len;
-    std::vector<std::string> buf = editorRowToString(&len);
-    // int fd = open(file_list.p[file_number].path, O_RDWR | O_CREAT, 0644);
+    int len = 0;
+    std::vector<std::string> buf = editorRowToString(len);
     std::ofstream file;
     file.open(file_list.p[file_number].path, std::ofstream::trunc);
-    // if (file != -1) {
-    // if (ftruncate(fd, len) != -1) {
     for (int i = 0; i < buf.size(); i++) {
-        // if (write(fd, buf, len) == len) {
-        // close(fd);
-        // free(buf);
         file << buf[i] << std::endl;
         E.dirty = 0;
-        editorSetStatusMessage("%d bytes written to disk", len);
-        // return;
-        //  }
+        editorSetStatusMessage("%d characters written to disk", len);
     }
     file.close();
     return;
-    //}
-    // close(fd);
-    //}
-    // free(buf);
     editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
 }
 

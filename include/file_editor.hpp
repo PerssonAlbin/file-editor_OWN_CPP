@@ -68,7 +68,6 @@ class FileEditor {
     /* Terminal handling */
     typedef struct erow {
         int rsize = 0;
-        int size = 0;
         std::string chars;
         char* render;
     } erow;
@@ -106,7 +105,7 @@ class FileEditor {
 
     /* Buffer Functions */
     void bufferAppend(const char* s, int len);
-    std::vector<std::string> editorRowToString(int* buflen);
+    std::vector<std::string> editorRowToString(int& buflen);
     void editorUpdateRow(erow* row);
     void resetRows();
     void editorFlushRows();

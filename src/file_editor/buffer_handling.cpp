@@ -19,22 +19,12 @@ void FileEditor::bufferAppend(const char* s, int len) {
     buffer.len += len;
 }
 
-std::vector<std::string> FileEditor::editorRowToString(int* buflen) {
-    // int totlen = 0;
+std::vector<std::string> FileEditor::editorRowToString(int& buflen) {
     int j;
-    // for (j = 0; j < E.numrows; j++)
-    //     totlen += E.row[j].size + 1;
-    // *buflen = totlen;
-
-    // char* buf = reinterpret_cast<char*>(malloc(totlen));
     std::vector<std::string> buf;
-    // char* p = buf;
     for (j = 0; j < E.numrows; j++) {
-        // memcpy(p, E.row[j].chars, E.row[j].size);
-        // buf p += E.row[j].size;
-        // *p = '\n';
-        // p++;
         buf.push_back(E.row[j].chars);
+        buflen += E.row[j].chars.size();
     }
     return buf;
 }
@@ -43,7 +33,6 @@ std::vector<std::string> FileEditor::editorRowToString(int* buflen) {
 void FileEditor::editorUpdateRow(erow* row) {
     int tabs = 0;
     int j;
-    row->size = row->chars.size();
     for (j = 0; j < row->chars.size(); j++) {
         if (row->chars[j] == TAB)
             tabs++;
@@ -57,7 +46,7 @@ void FileEditor::editorUpdateRow(erow* row) {
     row->render = reinterpret_cast<char*>(
         malloc(syntaxed_row.size() + tabs * (TAB_STOP - 1) + 1));
     int idx = 0;
-    row->rsize = syntax.added_length + row->size;
+    row->rsize = syntax.added_length + row->chars.size();
     for (j = 0; j < row->rsize; j++) {
         if (syntaxed_row[j] == TAB) {
             row->render[idx++] = ' ';
@@ -79,7 +68,7 @@ void FileEditor::editorInsertRow(int at, std::string s, size_t len) {
     }
     // Extends the amount of rows by one
     if (at == E.row.size()) {
-        erow temp_row = {0, 0, s, NULL};
+        erow temp_row = {0, s, NULL};
         E.row.push_back(temp_row);
     } else {
         // Erases from the "old" row so that that only whats before the mouse
@@ -87,23 +76,10 @@ void FileEditor::editorInsertRow(int at, std::string s, size_t len) {
         E.row[at - 1].chars.erase(E.row[at - 1].chars.size() - s.size(),
                                   s.size());
         // Adds a new row with the string to the right of the mouse
-        erow temp_row = {0, 0, s, NULL};
+        erow temp_row = {0, s, NULL};
         E.row.insert(E.row.begin() + at, temp_row);
     }
-    // E.row =
-    //    reinterpret_cast<erow*>(realloc(E.row, sizeof(erow) * (E.numrows +
-    //    1)));
-    // Moves the rows 1 step down from the current position
-    // memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
-
-    // In case the row is cut off in the middle this makes sure the length
-    // reflects that
-    E.row[at].size = len;
-    // E.row[at].chars = s;
-    //  E.row[at].chars = reinterpret_cast<char*>(malloc(len + 1));
-    //  Copies from the mouse x point and forward len characters
-    //  memcpy(E.row[at].chars, s, len);
-    //  E.row[at].chars[len] = END_OF_ROW;
+    // E.row[at].size = len;
 
     E.row[at].rsize = 0;
     E.row[at].render = NULL;
@@ -114,21 +90,14 @@ void FileEditor::editorInsertRow(int at, std::string s, size_t len) {
 }
 
 void FileEditor::editorRowInsertChar(int at, int input) {
-    if (at < 0 || at > E.row[c.y].size) {
-        at = E.row[c.y].size;
+    if (at < 0 || at > E.row[c.y].chars.size()) {
+        at = E.row[c.y].chars.size();
     }
-    // E.row[c.y].chars =
-    //      reinterpret_cast<char*>(realloc(E.row[c.y].chars, E.row[c.y].size +
-    //      2));
-
-    // memmove(&E.row[c.y].chars[at + 1], &E.row[c.y].chars[at],
-    //          E.row[c.y].size - at);
     char c_input = input;
     std::string str_input = &c_input;
     E.row[c.y].chars.insert(at, str_input);
 
-    E.row[c.y].size++;
-    // E.row[c.y].chars[at] = input;
+    // E.row[c.y].size++;
     editorUpdateRow(&E.row[c.y]);
     E.dirty++;
 }
@@ -154,7 +123,6 @@ void FileEditor::resetRows() {
 
 /* Frees one row */
 void FileEditor::editorFreeRow(erow* row) {
-    // free(row->chars);
     row->chars = "";
     free(row->render);
 }
@@ -167,8 +135,6 @@ void FileEditor::editorFlushRows() {
         x += 1;
     }
     E.row.clear();
-    // free(E.row);
-    // E.row = NULL;
 }
 
 void FileEditor::editorDelRow(int at) {
@@ -182,11 +148,11 @@ void FileEditor::editorDelRow(int at) {
 }
 
 void FileEditor::editorRowDelChar(erow* row, int at_x, int at_y) {
-    if (at_x < 0 || at_x >= row->size) {
+    if (at_x < 0 || at_x >= row->chars.size()) {
         return;
     }
-    memmove(&row->chars[at_x], &row->chars[at_x + 1], row->size - at_x);
-    row->size--;
+    memmove(&row->chars[at_x], &row->chars[at_x + 1], row->chars.size() - at_x);
+    // row->size--;
     editorUpdateRow(row);
     E.dirty++;
 }
@@ -203,20 +169,16 @@ void FileEditor::editorDelChar() {
         editorRowDelChar(row, c.x - 1, c.y);
         c.x--;
     } else {
-        c.x = E.row[c.y - 1].size;
-        editorRowAppendString(&E.row[c.y - 1], row->chars, row->size);
+        c.x = E.row[c.y - 1].chars.size();
+        editorRowAppendString(&E.row[c.y - 1], row->chars, row->chars.size());
         editorDelRow(c.y);
         c.y--;
     }
 }
 
 void FileEditor::editorRowAppendString(erow* row, std::string s, size_t len) {
-    // row->chars =
-    //     reinterpret_cast<char*>(realloc(row->chars, row->size + len + 1));
-    // memcpy(&row->chars[row->size], s, len);
-    row->chars.insert(row->size, s);
-    row->size += len;
-    row->chars[row->size] = END_OF_ROW;
+    row->chars.insert(row->chars.size(), s);
+    row->chars[row->chars.size()] = END_OF_ROW;
     editorUpdateRow(row);
     E.dirty++;
 }
@@ -226,10 +188,10 @@ void FileEditor::editorInsertNewline() {
         editorInsertRow(c.y, const_cast<char*>(""), 0);
     } else {
         erow* row = &E.row[c.y];
-        editorInsertRow(c.y + 1, &row->chars[c.x], row->size - c.x);
+        editorInsertRow(c.y + 1, &row->chars[c.x], row->chars.size() - c.x);
         row = &E.row[c.y];
-        row->size = c.x;
-        row->chars[row->size] = END_OF_ROW;
+        // row->size = c.x;
+        row->chars[row->chars.size()] = END_OF_ROW;
         editorUpdateRow(row);
     }
     c.y++;
