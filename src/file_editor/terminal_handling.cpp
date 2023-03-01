@@ -170,9 +170,10 @@ bool FileEditor::editorProcessKeypress() {
     case CTRL_KEY('w'):
         write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
         write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
-        if (file_number >= 0 && file_number < file_list.size) {
+        if (file_number >= 0 && file_number < file_list.p->size) {
             file_number++;
             resetRows();
+            char* test_val = file_list.p[file_number].path;
             editorOpen(file_list.p[file_number].path);
         }
         break;

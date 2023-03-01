@@ -166,6 +166,7 @@ void FileEditor::editorFlushRows() {
         editorFreeRow(&E.row[x]);
         x += 1;
     }
+    E.row.clear();
     // free(E.row);
     // E.row = NULL;
 }
