@@ -170,7 +170,7 @@ bool FileEditor::editorProcessKeypress() {
     case CTRL_KEY('w'):
         write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
         write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
-        if (file_number >= 0 && file_number < file_list.p->size) {
+        if (file_number >= 0 && file_number < file_list.p->size - 1) {
             file_number++;
             resetRows();
             char* test_val = file_list.p[file_number].path;
@@ -182,7 +182,7 @@ bool FileEditor::editorProcessKeypress() {
         break;
     case END_KEY: {
         if (c.y < E.numrows)
-            c.x = E.row[c.y].chars.size();
+            c.x = E.rows[c.y].chars.size();
     } break;
     case BACKSPACE:
     case CTRL_KEY('h'):

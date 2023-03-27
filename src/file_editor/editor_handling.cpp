@@ -19,12 +19,12 @@ void FileEditor::editorDrawRows() {
                 bufferAppend("~", 1);
             }
         } else {
-            int len = E.row[filerow].rsize - E.coloff;
+            int len = E.rows[filerow].render.size() - E.coloff;
             if (len < 0)
                 len = 0;
             if (len > screencols)
                 len = screencols;
-            bufferAppend(&E.row[filerow].render[E.coloff], len);
+            bufferAppend(&E.rows[filerow].render[E.coloff], len);
         }
         bufferAppend(TERM_CLEAR_LINES, 3);
         bufferAppend("\r\n", 2);
@@ -95,14 +95,14 @@ void FileEditor::editorScroll() {
 void FileEditor::editorMoveCursor(int key) {
     /* Moves cursor based on cases it gets from */
 
-    erow* row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
+    erow* row = (c.y >= E.numrows) ? NULL : &E.rows[c.y];
     switch (key) {
     case ARROW_LEFT:
         if (c.x != 0) {
             c.x--;
         } else if (c.y > 0) {
             c.y--;
-            c.x = E.row[c.y].chars.size();
+            c.x = E.rows[c.y].chars.size();
         }
         break;
     case ARROW_RIGHT:
@@ -122,7 +122,7 @@ void FileEditor::editorMoveCursor(int key) {
             c.y++;
         break;
     }
-    row = (c.y >= E.numrows) ? NULL : &E.row[c.y];
+    row = (c.y >= E.numrows) ? NULL : &E.rows[c.y];
     int rowlen = row ? row->chars.size() : 0;
     if (c.x > rowlen)
         c.x = rowlen;
@@ -134,7 +134,7 @@ int FileEditor::editorRowCxToRx() {
     int rx = 0;
     int j;
     for (j = 0; j < c.x; j++) {
-        if (E.row[c.y].chars[j] == TAB)
+        if (E.rows[c.y].chars[j] == TAB)
             rx += (TAB_STOP - 1) - (rx % TAB_STOP);
         rx++;
     }

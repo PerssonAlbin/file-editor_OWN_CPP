@@ -85,7 +85,7 @@ void FileEditor::editorOpen(char* filename) {
         while (line_str.size() > 0 && (line_str[line_str.size() - 1] == '\n' ||
                                        line_str[line_str.size() - 1] == '\r'))
             line_str.erase(line_str.size() - 1, 1);
-        editorInsertRow(E.numrows, line_str, linelen);
+        editorInsertRow(E.numrows, line_str);
     }
     free(line);
     fclose(fp);
