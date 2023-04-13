@@ -25,15 +25,15 @@ Make sure you have installed all of the following prerequisites on your developm
 
 You can install the prerequisites as follows:
 
-##### On Ubuntu/Debian: 
+#### On Ubuntu/Debian: 
 Run: `sudo apt install g++ make`
 And download the latest version of CMake from [here](https://cmake.org/download/)
 
-##### On Fedora/CentOS: 
+#### On Fedora/CentOS: 
 Run: `sudo dnf install gcc-c++ make`
 And download the latest version of CMake from [here](https://cmake.org/download/)
 
-##### On macOS: 
+#### On macOS: 
 Run: `brew install cmake`
 
 ## Build
