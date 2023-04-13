@@ -26,11 +26,11 @@ Make sure you have installed all of the following prerequisites on your developm
 You can install the prerequisites as follows:
 
 #### On Ubuntu/Debian: 
-Run: `sudo apt install g++ make`
+Run: `sudo apt install g++ make`<br />
 And download the latest version of CMake from [here](https://cmake.org/download/)
 
 #### On Fedora/CentOS: 
-Run: `sudo dnf install gcc-c++ make`
+Run: `sudo dnf install gcc-c++ make`<br />
 And download the latest version of CMake from [here](https://cmake.org/download/)
 
 #### On macOS: 
