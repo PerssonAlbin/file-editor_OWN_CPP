@@ -30,8 +30,7 @@ Run: `sudo apt install g++ make`<br />
 And download the latest version of CMake from [here](https://cmake.org/download/)
 
 #### On Fedora/CentOS: 
-Run: `sudo dnf install gcc-c++ make`<br />
-And download the latest version of CMake from [here](https://cmake.org/download/)
+Run: `sudo dnf install cmake gcc-c++ make`
 
 #### On macOS: 
 Run: `brew install cmake`
