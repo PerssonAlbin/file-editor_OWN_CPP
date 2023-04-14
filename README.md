@@ -5,11 +5,13 @@
 
 ## Table of contents
 
-* [General info](#general-info)
-* [Prerequisites](#Prerequisites)
-* [Build](#build)
-* [Commands](#Commands)
-* [License](#License)
+- [file-editor\_OWN\_CPP](#file-editor_own_cpp)
+  - [Table of contents](#table-of-contents)
+  - [General info](#general-info)
+  - [Prerequisites](#prerequisites)
+  - [Build](#build)
+  - [Commands](#commands)
+  - [License](#license)
 
 ## General info
 Simple command-line editor. Takes a directory as an argument and opens the files in that folder. Now have all the basic functionalities of a file editor.
@@ -18,16 +20,20 @@ Simple command-line editor. Takes a directory as an argument and opens the files
 
 Make sure you have installed all of the following prerequisites on your development machine:
 
-* `g++` to compile the code
-* `cmake` as build tool
+* `g++` with minimum version `5.0` to compile the code
+* `cmake` with minimum version `3.14` as build tool
 
 You can install the prerequisites as follows:
 
-On Ubuntu/Debian: `sudo apt install cmake g++ make`
+#### On Ubuntu/Debian: 
+Run: `sudo apt install g++ make`<br />
+And download the latest version of CMake from [here](https://cmake.org/download/)
 
-On Fedora/CentOS: `sudo dnf install cmake gcc-c++ make`
+#### On Fedora/CentOS: 
+Run: `sudo dnf install cmake gcc-c++ make`
 
-On macOS: `brew install cmake`
+#### On macOS: 
+Run: `brew install cmake`
 
 ## Build
 
@@ -60,11 +66,11 @@ If you are using Visual Studio Code then we recommend the [CMake Tools Extension
 
 ## Commands
 
-| Commands     ||
-|--------------|-----------|
-| Exit program | Ctrl-Q    |
-| Switch file  | Ctrl-W    |
-| Save file    | Ctrl-S    |
+| Commands     |        |
+| ------------ | ------ |
+| Exit program | Ctrl-Q |
+| Switch file  | Ctrl-W |
+| Save file    | Ctrl-S |
 
 ## License
 
