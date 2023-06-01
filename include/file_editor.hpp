@@ -4,10 +4,16 @@
 
 #include "include/file_type.hpp"
 #include "include/syntax_highlight.hpp"
+#include <climits>
+#include <clocale>
+#include <codecvt>
+#include <cstdlib>
+#include <cuchar>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <stdarg.h>
 #include <string.h>
 #include <string>
@@ -131,6 +137,9 @@ class FileEditor {
     void editorSetStatusMessage(const char* fmt, ...);
     int editorReadKey();
     bool editorProcessKeypress();
+    std::string decimalToHex(int decimalValue);
+    std::string getUnicodeString(const std::string& hex);
+    std::string codepoint_to_utf8(char32_t codepoint);
     int getCursorPosition(int* rows, int* cols);
 
     /* Editor functions */

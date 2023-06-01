@@ -167,7 +167,7 @@ bool FileEditor::editorProcessKeypress() {
         editorSave();
         break;
     // Experimental, needs to skip executables.
-    case CTRL_KEY('w'):
+    case CTRL_KEY('w'): {
         write(STDOUT_FILENO, TERM_CLEAR_SCREEN, 4);
         write(STDOUT_FILENO, TERM_SEND_CURSOR_HOME, 3);
         if (file_number >= file_list.size - 1) {
@@ -178,7 +178,7 @@ bool FileEditor::editorProcessKeypress() {
         resetRows();
         char* test_val = file_list.p[file_number].path;
         editorOpen(file_list.p[file_number].path);
-        break;
+    } break;
     case HOME_KEY:
         c.x = 0;
         break;
@@ -216,10 +216,75 @@ bool FileEditor::editorProcessKeypress() {
     case CTRL_KEY('l'):
     case TERM_ESC:
         break;
-    default:
+    default: {
+        if (read_key == -61) {
+            int second_read_key = editorReadKey();
+            read_key = (read_key * -1) - 1;
+            second_read_key = (second_read_key * -1) - 1;
+            std::string str_key = decimalToHex(read_key);
+            std::string str_second_key = decimalToHex(second_read_key);
+            std::string hex_str = "     ";
+            hex_str[0] = str_key[1];
+            hex_str[1] = str_key[0];
+            hex_str[3] = str_second_key[1];
+            hex_str[4] = str_second_key[0];
+
+            // Convert hex string to integer
+            std::stringstream ss;
+            ss << std::hex << hex_str;
+            unsigned int hex_int;
+            ss >> hex_int;
+
+            wchar_t wc = std::strtol(hex_str.c_str(), NULL, 16);
+            std::wstring test = L"å";
+            int len = test.length();
+            // std::string attempt_conv = codepoint_to_utf8(hex_str.c_str());
+            //  Output the UTF-8 encoded string
+            // std::wcout << wc << std::endl;
+
+                        // Convert to Unicode hex
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            std::wstring unicode_hex = converter.from_bytes(hex_str);
+            std::wcout << std::hex << std::uppercase
+                       << static_cast<int>(unicode_hex[0]) << std::endl;
+
+            std::cout << "xxx" << std::endl;
+        }
         editorInsertChar(read_key);
-        break;
+
+    } break;
     }
     quit_times = QUIT_TIMES;
     return true;
+}
+
+std::string FileEditor::decimalToHex(int decimalValue) {
+    std::stringstream stream;
+    stream << std::hex << decimalValue; // convert to hexadecimal string
+    return stream.str();                // return the hexadecimal string
+}
+
+std::string FileEditor::getUnicodeString(const std::string& hex) {
+    std::istringstream codepoints{hex};
+    std::string cp;
+    std::string out;
+    std::mbstate_t state;
+    char u8[MB_LEN_MAX];
+
+    while (codepoints >> cp) {
+        char32_t c = std::stoul(cp, nullptr, 16);
+        auto len = std::c32rtomb(u8, c, &state);
+        if (len == std::size_t(-1)) {
+            std::cerr << "Unable to convert " << cp << " to UTF-8 codepoint!\n";
+            std::exit(EXIT_FAILURE);
+        } else if (len > 0) {
+            out.append(u8, len);
+        }
+    }
+    return out;
+}
+
+std::string FileEditor::codepoint_to_utf8(char32_t codepoint) {
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+    return convert.to_bytes(&codepoint, &codepoint + 1);
 }
