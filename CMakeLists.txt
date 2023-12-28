@@ -18,6 +18,7 @@ set(SOURCES
     src/file_editor/file_handling.cpp
     src/file_editor/terminal_handling.cpp
     src/syntax/syntax_highlight.cpp
+    src/helper_functions.cpp
     src/file_type/file_type.cpp)
 
 set(LIBRARY_NAME editor)

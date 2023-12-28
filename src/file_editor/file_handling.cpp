@@ -63,11 +63,11 @@ void FileEditor::editorSave() {
     for (int i = 0; i < buf.size(); i++) {
         file << buf[i] << std::endl;
         E.dirty = 0;
-        editorSetStatusMessage("%d characters written to disk", len);
+        editorSetStatusMessage(L"%d characters written to disk", len);
     }
     file.close();
     return;
-    editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
+    editorSetStatusMessage(L"Can't save! I/O error: %s", strerror(errno));
 }
 
 /*Opens a file taken as argument and send the content to the buffer.*/
@@ -77,11 +77,11 @@ void FileEditor::editorOpen(char* filename) {
         die("fopen");
 
     char* line = NULL;
-    std::string line_str = "";
+    std::wstring line_str = L"";
     size_t linecap = 0;
     ssize_t linelen;
     while ((linelen = getline(&line, &linecap, fp)) != -1) {
-        line_str = line;
+        line_str = std::wstring(line, line + strlen(line));
         while (line_str.size() > 0 && (line_str[line_str.size() - 1] == '\n' ||
                                        line_str[line_str.size() - 1] == '\r'))
             line_str.erase(line_str.size() - 1, 1);

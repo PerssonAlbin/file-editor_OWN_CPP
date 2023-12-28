@@ -10,13 +10,13 @@ void FileEditor::editorDrawRows() {
             if (E.numrows == 0 && y == screenrows / 3) {
                 int padding = (screencols) / 2;
                 if (padding) {
-                    bufferAppend("~", 1);
+                    bufferAppend(L"~", 1);
                     padding--;
                 }
                 while (padding--)
-                    bufferAppend(" ", 1);
+                    bufferAppend(L" ", 1);
             } else {
-                bufferAppend("~", 1);
+                bufferAppend(L"~", 1);
             }
         } else {
             int len = E.rows[filerow].render.size() - E.coloff;
@@ -26,24 +26,24 @@ void FileEditor::editorDrawRows() {
                 len = screencols;
             bufferAppend(&E.rows[filerow].render[E.coloff], len);
         }
-        bufferAppend(TERM_CLEAR_LINES, 3);
-        bufferAppend("\r\n", 2);
+        bufferAppend(TERM_CLEAR_LINES, 4);
+        bufferAppend(L"\r\n", 3);
     }
 }
 
 /*Appends the status bar with white background showing filename
 and current_line/total_lines.*/
 void FileEditor::editorDrawStatusBar() {
-    bufferAppend(TERM_INVERSE_COLOR, 4);
-    char status[80];
-    char rstatus[80];
+    bufferAppend(TERM_INVERSE_COLOR, 5);
+    wchar_t status[80];
+    wchar_t rstatus[80];
 
-    int len = snprintf(status, sizeof(status), "%.20s %s",
+    int len = swprintf(status, sizeof(status), L"%.20s %s",
                        file_list.p[file_number].filename
                            ? file_list.p[file_number].filename
                            : "[No Name]",
                        E.dirty ? "(modified)" : "");
-    int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d", c.y + 1, E.numrows);
+    int rlen = swprintf(rstatus, sizeof(rstatus), L"%d/%d", c.y + 1, E.numrows);
     if (len > screencols)
         len = screencols;
     bufferAppend(status, len);
@@ -52,18 +52,18 @@ void FileEditor::editorDrawStatusBar() {
             bufferAppend(rstatus, rlen);
             break;
         } else {
-            bufferAppend(" ", 1);
+            bufferAppend(L" ", 1);
             len++;
         }
     }
-    bufferAppend(TERM_RESET_STYLE, 3);
-    bufferAppend("\r\n", 2);
+    bufferAppend(TERM_RESET_STYLE, 4);
+    bufferAppend(L"\r\n", 2);
 }
 
 /*Simply render message bar for displaying info.*/
 void FileEditor::editorDrawMessageBar() {
-    bufferAppend(TERM_CLEAR_LINES, 3);
-    int msglen = strlen(E.statusmsg);
+    bufferAppend(TERM_CLEAR_LINES, 4);
+    int msglen = wcslen(E.statusmsg);
     if (msglen > screencols)
         msglen = screencols;
     if (msglen && time(NULL) - E.statusmsg_time < 5)
@@ -146,22 +146,22 @@ the other info to be displayed.*/
 void FileEditor::editorRefreshScreen() {
     editorScroll();
 
-    bufferAppend(TERM_HIDE_CURSOR, 6);
-    bufferAppend(TERM_SEND_CURSOR_HOME, 3);
+    bufferAppend(TERM_HIDE_CURSOR, 7);
+    bufferAppend(TERM_SEND_CURSOR_HOME, 4);
 
     editorDrawRows();
     editorDrawStatusBar();
     editorDrawMessageBar();
 
-    char buf[32];
+    wchar_t buf[32];
     // Tracks cursor
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (c.y - E.rowoff) + 1,
+    swprintf(buf, sizeof(buf), L"\x1b[%d;%dH", (c.y - E.rowoff) + 1,
              (c.rx - E.coloff) + 1);
-    bufferAppend(buf, strlen(buf));
+    bufferAppend(buf, wcslen(buf));
 
-    bufferAppend(TERM_SHOW_CURSOR, 6);
+    bufferAppend(TERM_SHOW_CURSOR, 7);
 
     write(STDOUT_FILENO, buffer.b, buffer.len);
     buffer.len = 0;
-    buffer.b = reinterpret_cast<char*>(realloc(buffer.b, 0));
+    buffer.b = reinterpret_cast<wchar_t*>(realloc(buffer.b, 0));
 }

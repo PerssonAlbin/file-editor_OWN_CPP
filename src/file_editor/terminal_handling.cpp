@@ -38,10 +38,10 @@ int FileEditor::getWindowSize(int* rows, int* cols) {
 }
 
 /*???*/
-void FileEditor::editorSetStatusMessage(const char* fmt, ...) {
+void FileEditor::editorSetStatusMessage(const wchar_t* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    vsnprintf(E.statusmsg, sizeof(E.statusmsg), fmt, ap);
+    vswprintf(E.statusmsg, sizeof(E.statusmsg), fmt, ap);
     va_end(ap);
     E.statusmsg_time = time(NULL);
 }
@@ -155,7 +155,7 @@ bool FileEditor::editorProcessKeypress() {
     case CTRL_KEY('q'):
         if (E.dirty && quit_times > 0) {
             editorSetStatusMessage(
-                "File has unsaved changes. Press Ctrl-Q again to quit");
+                L"File has unsaved changes. Press Ctrl-Q again to quit");
             quit_times--;
             return true;
         }
@@ -219,36 +219,24 @@ bool FileEditor::editorProcessKeypress() {
     default: {
         if (read_key == -61) {
             int second_read_key = editorReadKey();
-            read_key = (read_key * -1) - 1;
-            second_read_key = (second_read_key * -1) - 1;
-            std::string str_key = decimalToHex(read_key);
-            std::string str_second_key = decimalToHex(second_read_key);
-            std::string hex_str = "     ";
-            hex_str[0] = str_key[1];
-            hex_str[1] = str_key[0];
-            hex_str[3] = str_second_key[1];
-            hex_str[4] = str_second_key[0];
+            editorInsertChar(read_key);
+            editorInsertChar(second_read_key);
+            // second_read_key = (second_read_key * -1) - 1;
+            // std::string str_key = read_key + second_read_key;
+            // std::string str_second_key = decimalToHex(second_read_key);
 
             // Convert hex string to integer
-            std::stringstream ss;
-            ss << std::hex << hex_str;
-            unsigned int hex_int;
-            ss >> hex_int;
+            // std::stringstream ss;
+            // ss << std::hex << hex_str;
+            // unsigned int hex_int;
+            // ss >> hex_int;
 
-            wchar_t wc = std::strtol(hex_str.c_str(), NULL, 16);
-            std::wstring test = L"å";
-            int len = test.length();
-            // std::string attempt_conv = codepoint_to_utf8(hex_str.c_str());
-            //  Output the UTF-8 encoded string
-            // std::wcout << wc << std::endl;
-
-                        // Convert to Unicode hex
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::wstring unicode_hex = converter.from_bytes(hex_str);
-            std::wcout << std::hex << std::uppercase
-                       << static_cast<int>(unicode_hex[0]) << std::endl;
-
-            std::cout << "xxx" << std::endl;
+            // wchar_t wc = std::strtol(hex_str.c_str(), NULL, 16);
+            // std::wstring test = L"å";
+            // int len = test.length();
+            //  std::string attempt_conv = codepoint_to_utf8(hex_str.c_str());
+            //   Output the UTF-8 encoded string
+            //  std::wcout << wc << std::endl;
         }
         editorInsertChar(read_key);
 

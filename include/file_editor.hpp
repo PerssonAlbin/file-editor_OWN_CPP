@@ -32,7 +32,7 @@
 
 #define _BSD_SOURCE
 
-#define CTRL_KEY(k) ((k)&0x1f)
+#define CTRL_KEY(k) ((k) & 0x1f)
 #define TAB_STOP 4
 #define QUIT_TIMES 2
 namespace fs = std::filesystem;
@@ -42,7 +42,7 @@ class FileEditor {
   private:
     // Append buffer
     struct abuf {
-        char* b = reinterpret_cast<char*>(malloc(0));
+        wchar_t* b = reinterpret_cast<wchar_t*>(malloc(0));
         int len = 0;
     };
     abuf buffer;
@@ -73,15 +73,15 @@ class FileEditor {
 
     /* Terminal handling */
     typedef struct erow {
-        std::string chars;
-        std::string render;
+        std::wstring chars;
+        std::wstring render;
     } erow;
     struct editorConfig {
         int numrows = 0;
         std::vector<erow> rows;
         int rowoff = 0;
         int coloff = 0;
-        char statusmsg[80];
+        wchar_t statusmsg[80];
         time_t statusmsg_time = 0;
         int dirty = 0;
     };
@@ -107,20 +107,23 @@ class FileEditor {
     void die(const char* s);
     void clearFileList();
 
+    /* Helper functions */
+    std::string wstringToString(std::wstring wstring_to_conv);
+
     /* Buffer Functions */
-    void bufferAppend(const char* s, int len);
+    void bufferAppend(const wchar_t* s, int len);
     std::vector<std::string> editorRowToString(int& buflen);
     void editorUpdateRow(erow* row);
     void resetRows();
     void editorFlushRows();
     void editorFreeRow(erow* row);
-    void editorInsertRow(int at, std::string s);
+    void editorInsertRow(int at, std::wstring s);
     void editorRowInsertChar(int at, int input);
     void editorInsertChar(int read_key);
     void editorRowDelChar(erow* row, int at_x, int at_y);
     void editorDelChar();
     void editorDelRow(int at);
-    void editorRowAppendString(erow* row, std::string s);
+    void editorRowAppendString(erow* row, std::wstring s);
     void editorInsertNewline();
 
     /* File functions */
@@ -134,7 +137,7 @@ class FileEditor {
     void enableRawMode();
     void disableRawMode();
     int getWindowSize(int* rows, int* cols);
-    void editorSetStatusMessage(const char* fmt, ...);
+    void editorSetStatusMessage(const wchar_t* fmt, ...);
     int editorReadKey();
     bool editorProcessKeypress();
     std::string decimalToHex(int decimalValue);
@@ -152,16 +155,16 @@ class FileEditor {
     void editorScroll();
 
     /* ANSI Escape Sequence for terminals */
-    inline static const char END_OF_ROW = '\0';
-    inline static const char TERM_ESC = '\x1b';
-    inline static const char TAB = '\t';
-    inline static const char* TERM_CLEAR_LINES = "\x1b[K";
-    inline static const char* TERM_RESET_STYLE = "\x1b[m";
-    inline static const char* TERM_INVERSE_COLOR = "\x1b[7m";
-    inline static const char* TERM_CLEAR_SCREEN = "\x1b[2J";
-    inline static const char* TERM_SEND_CURSOR_HOME = "\x1b[H";
-    inline static const char* TERM_SHOW_CURSOR = "\x1b[?25h";
-    inline static const char* TERM_HIDE_CURSOR = "\x1b[?25l";
+    inline static const wchar_t END_OF_ROW = L'\0';
+    inline static const wchar_t TERM_ESC = L'\x1b';
+    inline static const wchar_t TAB = L'\t';
+    inline static const wchar_t* TERM_CLEAR_LINES = L"\x1b[K";
+    inline static const wchar_t* TERM_RESET_STYLE = L"\x1b[m";
+    inline static const wchar_t* TERM_INVERSE_COLOR = L"\x1b[7m";
+    inline static const wchar_t* TERM_CLEAR_SCREEN = L"\x1b[2J";
+    inline static const wchar_t* TERM_SEND_CURSOR_HOME = L"\x1b[H";
+    inline static const wchar_t* TERM_SHOW_CURSOR = L"\x1b[?25h";
+    inline static const wchar_t* TERM_HIDE_CURSOR = L"\x1b[?25l";
 
   public:
     // Init

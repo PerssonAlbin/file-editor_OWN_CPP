@@ -7,9 +7,9 @@ Arguments:
 Char string to add to buffer
 The size of the char string
 */
-void FileEditor::bufferAppend(const char* s, int len) {
-    char* new_buffer =
-        reinterpret_cast<char*>(realloc(buffer.b, buffer.len + len));
+void FileEditor::bufferAppend(const wchar_t* s, int len) {
+    wchar_t* new_buffer = reinterpret_cast<wchar_t*>(
+        realloc(buffer.b, (buffer.len + len) * sizeof(wchar_t)));
 
     if (new_buffer == NULL) {
         return;
@@ -22,8 +22,10 @@ void FileEditor::bufferAppend(const char* s, int len) {
 std::vector<std::string> FileEditor::editorRowToString(int& buflen) {
     int j;
     std::vector<std::string> buf;
+    std::string conv_temp;
     for (j = 0; j < E.numrows; j++) {
-        buf.push_back(E.rows[j].chars);
+        conv_temp = wstringToString(E.rows[j].chars);
+        buf.push_back(conv_temp);
         buflen += E.rows[j].chars.size();
     }
     return buf;
@@ -39,36 +41,37 @@ void FileEditor::editorUpdateRow(erow* row) {
     }
 
     // free(row->render);
-    row->render = "";
-    SyntaxHighlight syntax;
-    std::string syntaxed_row =
-        syntax.hightlightLine(row->chars, file_list.p[file_number].filename);
+    row->render = L"";
+    // std::string chars_string = wstringToString(row->chars);
+    // SyntaxHighlight syntax;
+    // std::string syntaxed_row = syntax.hightlightLine(chars_string,
+    //     file_list.p[file_number].filename);
 
     // row->render = reinterpret_cast<char*>(
     //     malloc(syntaxed_row.size() + tabs * (TAB_STOP - 1) + 1));
     int idx = 0;
 
-    for (j = 0; j < syntax.added_length + row->chars.size(); j++) {
-        if (syntaxed_row[j] == TAB) {
+    for (j = 0; j < /*syntax.added_length +*/ row->chars.size(); j++) {
+        if (row->chars[j] == TAB) {
             row->render.push_back(' ');
             while (idx % TAB_STOP != 0) {
                 row->render.push_back(' ');
             }
         } else {
-            row->render.push_back(syntaxed_row[j]);
+            row->render.push_back(row->chars[j]);
         }
     }
     row->render.push_back(END_OF_ROW);
 }
 
 /*Appends a char string to a char string inside a row.*/
-void FileEditor::editorInsertRow(int at, std::string s) {
+void FileEditor::editorInsertRow(int at, std::wstring s) {
     if (at < 0 || at > E.numrows) {
         return;
     }
     // Extends the amount of rows by one
     if (at == E.rows.size()) {
-        erow temp_row = {s, ""};
+        erow temp_row = {s, L""};
         E.rows.push_back(temp_row);
     } else {
         // Erases from the "old" row so that that only whats before the mouse
@@ -76,11 +79,11 @@ void FileEditor::editorInsertRow(int at, std::string s) {
         E.rows[at - 1].chars.erase(E.rows[at - 1].chars.size() - s.size(),
                                    s.size());
         // Adds a new row with the string to the right of the mouse
-        erow temp_row = {s, ""};
+        erow temp_row = {s, L""};
         E.rows.insert(E.rows.begin() + at, temp_row);
     }
 
-    E.rows[at].render = "";
+    E.rows[at].render = L"";
     editorUpdateRow(&E.rows[at]);
 
     E.numrows++;
@@ -91,8 +94,8 @@ void FileEditor::editorRowInsertChar(int at, int input) {
     if (at < 0 || at > E.rows[c.y].chars.size()) {
         at = E.rows[c.y].chars.size();
     }
-    char c_input = input;
-    std::string str_input = &c_input;
+    wchar_t c_input = input;
+    std::wstring str_input = &c_input;
     E.rows[c.y].chars.insert(at, str_input);
 
     // E.rows[c.y].size++;
@@ -102,7 +105,7 @@ void FileEditor::editorRowInsertChar(int at, int input) {
 
 void FileEditor::editorInsertChar(int read_key) {
     if (c.y == E.numrows) {
-        editorInsertRow(E.numrows, const_cast<char*>(""));
+        editorInsertRow(E.numrows, const_cast<wchar_t*>(L""));
     }
     editorRowInsertChar(c.x, read_key);
     c.x++;
@@ -121,8 +124,8 @@ void FileEditor::resetRows() {
 
 /* Frees one row */
 void FileEditor::editorFreeRow(erow* row) {
-    row->chars = "";
-    row->render = "";
+    row->chars = L"";
+    row->render = L"";
 }
 
 /*Frees all the buffered rows */
@@ -174,7 +177,7 @@ void FileEditor::editorDelChar() {
     }
 }
 
-void FileEditor::editorRowAppendString(erow* row, std::string s) {
+void FileEditor::editorRowAppendString(erow* row, std::wstring s) {
     row->chars.insert(row->chars.size(), s);
     row->chars[row->chars.size()] = END_OF_ROW;
     editorUpdateRow(row);
@@ -183,7 +186,7 @@ void FileEditor::editorRowAppendString(erow* row, std::string s) {
 
 void FileEditor::editorInsertNewline() {
     if (c.x == 0) {
-        editorInsertRow(c.y, const_cast<char*>(""));
+        editorInsertRow(c.y, const_cast<wchar_t*>(L""));
     } else {
         erow* row = &E.rows[c.y];
         editorInsertRow(c.y + 1, &row->chars[c.x]);
